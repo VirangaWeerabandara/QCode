@@ -12,11 +12,11 @@ export default function Home() {
         <div className="main-content">
           {/* App Info Section */}
           <div className="app-info">
-            <img
-              src="/benefits-of-solving-rubiks-cube.jpg" // Replace with the actual path to your image
+            {/* <img
+              src="/benefits-of-solving-rubiks-cube.jpg" 
               alt="Quiz Making"
               className="app-photo"
-            />
+            /> */}
             <div className="app-details">
               <h1>Welcome to <span className="highlight">Q-Code</span></h1>
               <p>
