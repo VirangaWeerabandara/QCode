@@ -100,7 +100,7 @@ const SignDialog: React.FC = () => {
       setIsLoading(false)
       setIsOpen(false)
 
-      router.push('/home')
+      router.push('/dashboard')
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to connect to server')
