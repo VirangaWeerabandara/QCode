@@ -1,4 +1,4 @@
-"use client"; // Add this directive at the very top
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -8,55 +8,63 @@ import { MdOutlineKeyboardArrowLeft } from "react-icons/md";
 import { useState } from "react";
 
 const sidebarItems = [
-    {
-        name: "Home",
-        href: "/",
-        icon: AiOutlineHome,
-    },
-    {
-        name: "About",
-        href: "/about",
-        icon: TiContacts,
-    },
+  {
+    name: "Home",
+    href: "/",
+    icon: AiOutlineHome,
+  },
+  {
+    name: "About",
+    href: "/about",
+    icon: TiContacts,
+  },
 ];
 
 export default function Sidebar() {
-    const [isCollapsedSidebar, setIsCollapsedSidebar] = useState<boolean>(false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
-    const toggleSidebarCollapseHandler = () => {
-        setIsCollapsedSidebar((prev) => !prev);
-    };
+  return (
+    <div className="relative">
+      <button
+        className="absolute -right-3 top-18 w-8 h-8 bg-gold rounded-full flex items-center justify-center cursor-pointer border border-grey500 hover:rotate-180 transition-transform duration-300"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+      >
+        <MdOutlineKeyboardArrowLeft />
+      </button>
 
-    return (
-        <div className="sidebar_wrapper">
-            <button className="btn" onClick={toggleSidebarCollapseHandler}>
-                <MdOutlineKeyboardArrowLeft />
-            </button>
-            <aside className="sidebar" data-collapse={isCollapsedSidebar}>
-                <div className="sidebar_top">
-                    <Image
-                        src="/q.png"
-                        width={80}
-                        height={80}
-                        className="sidebar_logo"
-                        alt="logo"
-                    />
-
-                
-                </div>
-                <ul className="sidebar_list">
-                    {sidebarItems.map(({ name, href, icon: Icon }) => (
-                        <li className="sidebar_item" key={name}>
-                            <Link href={href} className="sidebar_link">
-                                <span className="sidebar_icon">
-                                    <Icon />
-                                </span>
-                                <span className="sidebar_name">{name}</span>
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            </aside>
+      <aside
+        className={`${
+          isCollapsed ? "w-24" : "w-64"
+        } h-full bg-midnightblue p-6 transition-all duration-300 rounded-xl`}
+      >
+        <div className="w-fit flex items-center gap-4 pb-8 mb-4 border-b border-gunmetalgray">
+          <Image
+            src="/q.png"
+            width={isCollapsed ? 48 : 80}
+            height={isCollapsed ? 48 : 80}
+            className="object-cover rounded-2xl border-2 border-gold"
+            alt="logo"
+          />
         </div>
-    );
-} 
+
+        <ul className="pt-4">
+          {sidebarItems.map(({ name, href, icon: Icon }) => (
+            <li key={name} className="mb-4">
+              <Link
+                href={href}
+                className="flex items-center text-lg text-white p-3 bg-opacity-20 bg-darkgray rounded-lg hover:bg-charcoal hover:scale-105 transition-all duration-300"
+              >
+                <span className="text-xl">
+                  <Icon />
+                </span>
+                {!isCollapsed && (
+                  <span className="ml-3 font-medium">{name}</span>
+                )}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </aside>
+    </div>
+  );
+}
