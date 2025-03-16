@@ -7,7 +7,7 @@ interface Props {
 
 export default function BaseLayout({ children }: Props) {
   return (
-    <div className="flex h-screen gap-8 text-charcoal bg-lightkblue">
+    <div className="layout">
       <Sidebar />
       {children}
     </div>
