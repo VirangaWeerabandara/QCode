@@ -1,0 +1,20 @@
+version: '3'
+services:
+  backend:
+    image: {{ backend_image }}
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - MONGO_URI={{ mongodb_uri }}
+      - SECRET={{ jwt_secret }}
+      - CORS_ORIGIN=http://{{ ansible_host }}:3000
+    restart: always
+
+  frontend:
+    image: {{ frontend_image }}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: always

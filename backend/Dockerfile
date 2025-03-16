@@ -4,19 +4,10 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
-
-RUN npm install nodemon
-RUN npm install mongoose
-RUN npm install express
-RUN npm install dotenv
-RUN npm install bcrypt
-RUN npm install jsonwebtoken
-RUN npm install cors
-
+RUN npm ci --only=production
 
 COPY . .
 
 EXPOSE 4000
 
-CMD ["npm", "run", "dev"]
+CMD ["node", "server.js"]
