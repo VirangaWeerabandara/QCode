@@ -292,3 +292,149 @@ body {
   color: #6a4f89; /* Adjusted color for better contrast */
   font-weight: bold;
 }
+
+
+ /* create quiz */
+ .create-quiz-container {
+  background-color: #ede9f2;
+  color: #ffffff;
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0px 0px 20px rgba(153, 79, 153, 0.3);
+  text-align: center;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.go-back-btn {
+  background: transparent;
+  border: none;
+  color: #3d2e3d;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.go-back-btn:hover {
+  color: #1f0e1f;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: bold;
+  color: #270527;
+}
+
+.quiz-form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px; /* Increased gap between form groups */
+}
+
+.form-group {
+  text-align: left;
+  margin-bottom: 20px; /* Added spacing between form groups */
+}
+
+.form-label {
+  font-weight: 600;
+  color: #1f141f;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 10px; /* Slightly reduced padding */
+  border: 1.8px solid #390f39;
+  background: #e3c9f6;
+  color: #0f0e0e;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+}
+
+.form-input:focus,
+.form-select:focus {
+  border-color: #ff66ff;
+  box-shadow: 0px 0px 8px rgba(255, 0, 255, 0.4);
+}
+
+.question-group {
+  background: rgba(255, 0, 255, 0.08);
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #3d063d;
+  margin-top: 15px; /* Added spacing between question groups */
+  margin-bottom: 20px; /* Added spacing between question groups */
+}
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px; /* Added spacing between question header and inputs */
+}
+
+.delete-question-btn {
+  background: transparent;
+  border: none;
+  color: #17051c;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.delete-question-btn:hover {
+  color: #ff6666;
+}
+
+.option-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px; /* Added spacing between option groups */
+}
+
+.option-number {
+  color: #2b072b;
+  font-weight: 500;
+}
+
+.button-group {
+  display: flex;
+  gap: 15px; /* Added spacing between buttons */
+  justify-content: flex-end;
+  margin-top: 20px; /* Added spacing above buttons */
+}
+
+.add-question-btn,
+.submit-btn {
+  padding: 10px 20px; /* Smaller buttons */
+  font-size: 14px; /* Smaller font size */
+  background: linear-gradient(90deg, #341f34, #422642);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.add-question-btn:hover,
+.submit-btn:hover {
+  background: linear-gradient(90deg, #53125f, #480f4d);
+  transform: scale(1.03);
+}
+
+.add-question-btn:active,
+.submit-btn:active {
+  transform: scale(0.97);
+}

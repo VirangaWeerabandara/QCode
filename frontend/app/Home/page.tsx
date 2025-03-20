@@ -115,8 +115,8 @@
 //   );
 // }
 
-import BaseLayout from "./baseLayout";
-import Sidebar from "./Sidebar";
+import BaseLayout from "./baselayout";
+import Sidebar from "./sidebar";
 import Link from "next/link";
 
 export default function Home() {
