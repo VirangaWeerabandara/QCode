@@ -1,6 +1,6 @@
 module.exports = {
   testEnvironment: "node",
-  testMatch: ["**/__tests__/**/*.js", "**/?(*.)+(spec|test).js"],
-  coveragePathIgnorePatterns: ["/node_modules/"],
+  testMatch: ["**/__tests__/**/*.test.js"],
+  coveragePathIgnorePatterns: ["/node_modules/", "/__tests__/setup/"],
   setupFilesAfterEnv: ["./jest.setup.js"],
 };

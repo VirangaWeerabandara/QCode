@@ -7,21 +7,34 @@ let mongod;
 module.exports.connect = async () => {
   mongod = await MongoMemoryServer.create();
   const uri = mongod.getUri();
+
+  const mongooseOpts = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  };
+
   await mongoose.connect(uri);
+  console.log("MongoDB memory server connected");
 };
 
 // Clear all collections
 module.exports.clearDatabase = async () => {
-  const collections = mongoose.connection.collections;
-  for (const key in collections) {
-    const collection = collections[key];
-    await collection.deleteMany({});
+  if (mongoose.connection.readyState !== 0) {
+    const collections = mongoose.connection.collections;
+    for (const key in collections) {
+      const collection = collections[key];
+      await collection.deleteMany({});
+    }
   }
 };
 
 // Close connection and stop mongodb instance
 module.exports.closeDatabase = async () => {
-  await mongoose.connection.dropDatabase();
-  await mongoose.connection.close();
-  await mongod.stop();
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.connection.dropDatabase();
+    await mongoose.connection.close();
+    if (mongod) {
+      await mongod.stop();
+    }
+  }
 };

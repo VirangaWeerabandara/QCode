@@ -1,11 +1,17 @@
 const requireAuth = require("../../middleware/requireAuth");
 const User = require("../../models/userModel");
 const jwt = require("jsonwebtoken");
-const mongoose = require("mongoose");
 const db = require("../setup/db");
 
-// Mock jwt
-jest.mock("jsonwebtoken");
+// Mock jwt with more control
+jest.mock("jsonwebtoken", () => ({
+  verify: jest.fn(),
+}));
+
+// Reset mocks before each test
+beforeEach(() => {
+  jest.clearAllMocks();
+});
 
 beforeAll(async () => await db.connect());
 afterEach(async () => await db.clearDatabase());
@@ -22,7 +28,7 @@ describe("requireAuth Middleware", () => {
     });
 
     // Mock verify to return the user's ID
-    jwt.verify.mockImplementation(() => ({ _id: user._id }));
+    jwt.verify.mockReturnValue({ _id: user._id });
 
     const req = {
       headers: {

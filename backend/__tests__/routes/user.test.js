@@ -1,15 +1,24 @@
 const request = require("supertest");
 const express = require("express");
-const mongoose = require("mongoose");
 const userRoutes = require("../../routes/user");
+const User = require("../../models/userModel");
 const db = require("../setup/db");
+
+// Mock the token function
+jest.mock("jsonwebtoken", () => ({
+  sign: jest.fn().mockReturnValue("test-token"),
+}));
 
 // Create a simple express app for testing routes
 const app = express();
 app.use(express.json());
 app.use("/api/user", userRoutes);
 
-beforeAll(async () => await db.connect());
+beforeAll(async () => {
+  await db.connect();
+  process.env.SECRET = "test-secret"; // Set JWT secret for tests
+});
+
 afterEach(async () => await db.clearDatabase());
 afterAll(async () => await db.closeDatabase());
 
@@ -60,7 +69,13 @@ describe("User Routes", () => {
         password: "StrongP@ssw0rd123",
       };
 
-      await request(app).post("/api/user/signup").send(userData);
+      // Create the user directly through the model
+      await User.signup(
+        userData.firstName,
+        userData.lastName,
+        userData.email,
+        userData.password
+      );
 
       // Then try to log in
       const loginData = {
@@ -86,7 +101,13 @@ describe("User Routes", () => {
         password: "StrongP@ssw0rd123",
       };
 
-      await request(app).post("/api/user/signup").send(userData);
+      // Create the user directly through the model
+      await User.signup(
+        userData.firstName,
+        userData.lastName,
+        userData.email,
+        userData.password
+      );
 
       // Try to log in with wrong password
       const loginData = {
