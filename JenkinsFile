@@ -17,7 +17,14 @@ pipeline {
                 checkout scm
             }
         }
-        
+        stage('Test Backend') {
+            steps {
+                dir('backend') {
+                sh 'npm ci'
+                sh 'npm test'
+                }
+            }
+        }
         stage('Build Backend') {
             steps {
                 dir('backend') {
