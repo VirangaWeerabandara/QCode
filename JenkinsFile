@@ -9,6 +9,7 @@ pipeline {
         MONGODB_URI = credentials('mongodb-uri')
         JWT_SECRET = credentials('jwt-secret')
         SSH_KEY_PATH = credentials('aws-ssh-key')
+        
     }
     
     stages {
