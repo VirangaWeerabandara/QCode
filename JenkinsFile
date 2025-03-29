@@ -53,37 +53,37 @@ pipeline {
             }
         }
         
-        stage('Provision Infrastructure') {
-            steps {
-                dir(TERRAFORM_DIR) {
-                    sh '''
-                    terraform init
-                    terraform apply -auto-approve
-                    '''
+        // stage('Provision Infrastructure') {
+        //     steps {
+        //         dir(TERRAFORM_DIR) {
+        //             sh '''
+        //             terraform init
+        //             terraform apply -auto-approve
+        //             '''
                     
-                    script {
-                        env.PUBLIC_IP = sh(script: 'terraform output -raw public_ip', returnStdout: true).trim()
-                        echo "EC2 public IP: ${env.PUBLIC_IP}"
-                    }
-                }
-            }
-        }
+        //             script {
+        //                 env.PUBLIC_IP = sh(script: 'terraform output -raw public_ip', returnStdout: true).trim()
+        //                 echo "EC2 public IP: ${env.PUBLIC_IP}"
+        //             }
+        //         }
+        //     }
+        // }
         
-        stage('Deploy with Ansible') {
-            steps {
-                dir(ANSIBLE_DIR) {
-                    sh '''
-                    ansible-playbook -i inventory.yml playbook.yml \
-                    -e "public_ip=${PUBLIC_IP}" \
-                    -e "key_path=${SSH_KEY_PATH}" \
-                    -e "backend_image=${DOCKER_REGISTRY}/qcode-backend:latest" \
-                    -e "frontend_image=${DOCKER_REGISTRY}/qcode-frontend:latest" \
-                    -e "mongodb_uri=${MONGODB_URI}" \
-                    -e "jwt_secret=${JWT_SECRET}"
-                    '''
-                }
-            }
-        }
+        // stage('Deploy with Ansible') {
+        //     steps {
+        //         dir(ANSIBLE_DIR) {
+        //             sh '''
+        //             ansible-playbook -i inventory.yml playbook.yml \
+        //             -e "public_ip=${PUBLIC_IP}" \
+        //             -e "key_path=${SSH_KEY_PATH}" \
+        //             -e "backend_image=${DOCKER_REGISTRY}/qcode-backend:latest" \
+        //             -e "frontend_image=${DOCKER_REGISTRY}/qcode-frontend:latest" \
+        //             -e "mongodb_uri=${MONGODB_URI}" \
+        //             -e "jwt_secret=${JWT_SECRET}"
+        //             '''
+        //         }
+        //     }
+        // }
     }
     
     post {
