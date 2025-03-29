@@ -1,8 +1,8 @@
-import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, useState } from 'react'
-import { LockClosedIcon } from '@heroicons/react/20/solid'
-import { useRouter } from 'next/navigation' 
-import Image from 'next/image'
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment, useState } from "react";
+import { LockClosedIcon } from "@heroicons/react/20/solid";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface InputProps {
   value: string;
@@ -31,7 +31,7 @@ const EmailInput: React.FC<InputProps> = ({ value, onChange }) => (
       placeholder="Email address"
     />
   </div>
-)
+);
 
 const PasswordInput: React.FC<InputProps> = ({ value, onChange }) => (
   <div className="mb-4">
@@ -50,72 +50,71 @@ const PasswordInput: React.FC<InputProps> = ({ value, onChange }) => (
       placeholder="Password"
     />
   </div>
-)
+);
 
 interface ApiError {
   error: string;
 }
 
 function isApiError(data: any): data is ApiError {
-  return 'error' in data;
+  return "error" in data;
 }
 
 const SignDialog: React.FC = () => {
-  const [isOpen, setIsOpen] = useState<boolean>(false)
-  const [email, setEmail] = useState<string>('')
-  const [password, setPassword] = useState<string>('')
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const router = useRouter()
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError(null)
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
     try {
-      const response = await fetch('http://localhost:4000/api/user/login', {
-        method: 'POST',
+      const response = await fetch("http://localhost:4000/api/user/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password })
-      })
+        body: JSON.stringify({ email, password }),
+      });
 
-      const data = await response.json() as LoginResponse
+      const data = (await response.json()) as LoginResponse;
 
       if (!response.ok) {
-        setError(isApiError(data) ? data.error : 'Login failed')
-        setIsLoading(false)
-        return
+        setError(isApiError(data) ? data.error : "Login failed");
+        setIsLoading(false);
+        return;
       }
 
       // Store user data and token
-      localStorage.setItem('user', JSON.stringify(data))
+      localStorage.setItem("user", JSON.stringify(data));
 
       // Reset form
-      setEmail('')
-      setPassword('')
-      setIsLoading(false)
-      setIsOpen(false)
-
-      router.push('/dashboard')
-
+      setEmail("");
+      setPassword("");
+      setIsLoading(false);
+      setIsOpen(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to connect to server')
-      setIsLoading(false)
+      setError(
+        err instanceof Error ? err.message : "Failed to connect to server"
+      );
+      setIsLoading(false);
     }
-  }
+  };
 
   const closeModal = (): void => {
-    setIsOpen(false)
-    setError(null)
-  }
+    setIsOpen(false);
+    setError(null);
+  };
 
   const openModal = (): void => {
-    setIsOpen(true)
-  }
+    setIsOpen(true);
+  };
 
   return (
     <>
@@ -156,13 +155,13 @@ const SignDialog: React.FC = () => {
               >
                 <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                   <div>
-                  <Image
-                    className="mx-auto h-12 w-auto"
-                    src="/assets/logo/logo1.png"
-                    alt="Your Company"
-                    width={48} // Specify the width (h-12 = 48px)
-                    height={48} // Specify the height
-    />
+                    <Image
+                      className="mx-auto h-12 w-auto"
+                      src="/assets/logo/logo1.png"
+                      alt="Your Company"
+                      width={48} // Specify the width (h-12 = 48px)
+                      height={48} // Specify the height
+                    />
                     <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
                       Sign in to your account
                     </h2>
@@ -171,11 +170,11 @@ const SignDialog: React.FC = () => {
                   <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     <input type="hidden" name="remember" defaultValue="true" />
                     <div className="space-y-4">
-                      <EmailInput 
+                      <EmailInput
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                       />
-                      <PasswordInput 
+                      <PasswordInput
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                       />
@@ -189,7 +188,10 @@ const SignDialog: React.FC = () => {
                           type="checkbox"
                           className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                         />
-                        <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                        <label
+                          htmlFor="remember-me"
+                          className="ml-2 block text-sm text-gray-900"
+                        >
                           Remember me
                         </label>
                       </div>
@@ -209,7 +211,7 @@ const SignDialog: React.FC = () => {
                       <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                         <LockClosedIcon className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" />
                       </span>
-                      {isLoading ? 'Signing in...' : 'Sign in'}
+                      {isLoading ? "Signing in..." : "Sign in"}
                     </button>
                   </form>
                 </Dialog.Panel>
@@ -219,7 +221,7 @@ const SignDialog: React.FC = () => {
         </Dialog>
       </Transition>
     </>
-  )
-}
+  );
+};
 
-export default SignDialog
+export default SignDialog;

@@ -143,7 +143,6 @@ const Register = () => {
       localStorage.setItem("user", JSON.stringify(json));
       setIsLoading(false);
       closeModal();
-      window.location.href = "/dashboard";
     } catch (error) {
       setError("An error occurred during registration");
       setIsLoading(false);
