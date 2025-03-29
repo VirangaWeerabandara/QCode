@@ -108,7 +108,7 @@ pipeline {
         AWS_REGION = 'us-east-1'
         DOCKER_REGISTRY = credentials('DOCKER_HUB_USERNAME')
         MONGODB_URI = credentials('MONGO_URI')
-        JWT_SECRET = credentials('jwt-secret')
+        JWT_SECRET = credentials('SECRET')
     }
     
     tools {
@@ -132,35 +132,35 @@ pipeline {
             }
         }
         
-        stage('Build Backend') {
-            steps {
-                dir('backend') {
-                    // Add memory limits to Docker
-                    sh 'docker build --memory=512m --memory-swap=512m -t ${DOCKER_REGISTRY}/qcode-backend:latest .'
-                }
-            }
-        }
+        // stage('Build Backend') {
+        //     steps {
+        //         dir('backend') {
+        //             // Add memory limits to Docker
+        //             sh 'docker build --memory=512m --memory-swap=512m -t ${DOCKER_REGISTRY}/qcode-backend:latest .'
+        //         }
+        //     }
+        // }
         
-        stage('Build Frontend') {
-            steps {
-                dir('frontend') {
-                    // Add memory limits to Docker
-                    sh 'docker build --memory=512m --memory-swap=512m -t ${DOCKER_REGISTRY}/qcode-frontend:latest .'
-                }
-            }
-        }
+        // stage('Build Frontend') {
+        //     steps {
+        //         dir('frontend') {
+        //             // Add memory limits to Docker
+        //             sh 'docker build --memory=512m --memory-swap=512m -t ${DOCKER_REGISTRY}/qcode-frontend:latest .'
+        //         }
+        //     }
+        // }
         
-        stage('Push Images') {
-            steps {
-                withCredentials([string(credentialsId: 'docker-hub-password', variable: 'DOCKER_HUB_PASSWORD')]) {
-                    sh '''
-                    echo $DOCKER_HUB_PASSWORD | docker login -u ${DOCKER_REGISTRY} --password-stdin
-                    docker push ${DOCKER_REGISTRY}/qcode-backend:latest
-                    docker push ${DOCKER_REGISTRY}/qcode-frontend:latest
-                    '''
-                }
-            }
-        }
+        // stage('Push Images') {
+        //     steps {
+        //         withCredentials([string(credentialsId: 'docker-hub-password', variable: 'DOCKER_HUB_PASSWORD')]) {
+        //             sh '''
+        //             echo $DOCKER_HUB_PASSWORD | docker login -u ${DOCKER_REGISTRY} --password-stdin
+        //             docker push ${DOCKER_REGISTRY}/qcode-backend:latest
+        //             docker push ${DOCKER_REGISTRY}/qcode-frontend:latest
+        //             '''
+        //         }
+        //     }
+        // }
     }
     
     post {
