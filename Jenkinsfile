@@ -3,12 +3,12 @@ pipeline {
     
     environment {
         AWS_REGION = 'us-east-1'
-        TERRAFORM_DIR = 'terraform'
-        ANSIBLE_DIR = 'ansible'
-        DOCKER_REGISTRY = 'your-dockerhub-username'
-        MONGODB_URI = credentials('mongodb-uri')
+        // TERRAFORM_DIR = 'terraform'
+        // ANSIBLE_DIR = 'ansible'
+        DOCKER_REGISTRY = credentials('DOCKER_HUB_USERNAME')
+        MONGODB_URI = credentials('MONGO_URI')
         JWT_SECRET = credentials('jwt-secret')
-        SSH_KEY_PATH = credentials('aws-ssh-key')
+        // SSH_KEY_PATH = credentials('aws-ssh-key')
         
     }
     
