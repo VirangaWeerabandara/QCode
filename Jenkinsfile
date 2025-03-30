@@ -114,9 +114,9 @@ pipeline {
         KEY_PATH = '/var/lib/jenkins/jenkins-a.pem'
     }
     
-    tools {
-        nodejs 'node:18'
-    }
+    // tools {
+    //     nodejs 'node:18'
+    // }
     
     stages {
         stage('Checkout') {
