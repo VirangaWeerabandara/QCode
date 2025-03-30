@@ -1,0 +1,56 @@
+---
+- name: Deploy QCode Application
+  hosts: qcode
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - docker.io
+          - python3-pip
+        state: present
+
+    - name: Install Docker Python module
+      pip:
+        name: docker
+        state: present
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Create app directory
+      file:
+        path: /home/ubuntu/qcode
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: "0755"
+
+    - name: Create docker-compose.yml
+      template:
+        src: templates/docker-compose.yml.j2
+        dest: /home/ubuntu/qcode/docker-compose.yml
+        owner: ubuntu
+        group: ubuntu
+        mode: "0644"
+
+    - name: Pull Docker images
+      docker_image:
+        name: "{{ item }}"
+        source: pull
+      loop:
+        - "{{ docker_registry }}/qcode-backend:latest"
+        - "{{ docker_registry }}/qcode-frontend:latest"
+
+    - name: Run docker-compose
+      command: docker-compose up -d
+      args:
+        chdir: /home/ubuntu/qcode

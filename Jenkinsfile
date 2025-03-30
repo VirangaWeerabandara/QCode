@@ -3,17 +3,17 @@
     
 //     environment {
 //         AWS_REGION = 'us-east-1'
-//         // TERRAFORM_DIR = 'terraform'
-//         // ANSIBLE_DIR = 'ansible'
 //         DOCKER_REGISTRY = credentials('DOCKER_HUB_USERNAME')
 //         MONGODB_URI = credentials('MONGO_URI')
-//         JWT_SECRET = credentials('jwt-secret')
-//         // SSH_KEY_PATH = credentials('aws-ssh-key')
-        
+//         JWT_SECRET = credentials('SECRET')
+//         // EC2_IP = credentials('EC2_IP')
+//         // EC2_USER = 'ubuntu'
+//         // KEY_PATH = '/var/lib/jenkins/jenkins-a.pem'
 //     }
-//     tools {
-//         nodejs 'node:18'
-//     }
+    
+//     // tools {
+//     //     nodejs 'node:18'
+//     // }
     
 //     stages {
 //         stage('Checkout') {
@@ -21,11 +21,13 @@
 //                 checkout scm
 //             }
 //         }
+        
 //         stage('Test Backend') {
 //             steps {
 //                 dir('backend') {
-//                 sh 'npm install'
-//                 sh 'npm test'
+//                     // Limit Node.js memory usage and use less intensive install options
+//                     sh 'npm install'
+//                     sh 'npm test'
 //                 }
 //             }
 //         }
@@ -56,49 +58,31 @@
 //                 }
 //             }
 //         }
-        
-//         // stage('Provision Infrastructure') {
-//         //     steps {
-//         //         dir(TERRAFORM_DIR) {
-//         //             sh '''
-//         //             terraform init
-//         //             terraform apply -auto-approve
-//         //             '''
-                    
-//         //             script {
-//         //                 env.PUBLIC_IP = sh(script: 'terraform output -raw public_ip', returnStdout: true).trim()
-//         //                 echo "EC2 public IP: ${env.PUBLIC_IP}"
-//         //             }
-//         //         }
-//         //     }
-//         // }
-        
-//         // stage('Deploy with Ansible') {
-//         //     steps {
-//         //         dir(ANSIBLE_DIR) {
-//         //             sh '''
-//         //             ansible-playbook -i inventory.yml playbook.yml \
-//         //             -e "public_ip=${PUBLIC_IP}" \
-//         //             -e "key_path=${SSH_KEY_PATH}" \
-//         //             -e "backend_image=${DOCKER_REGISTRY}/qcode-backend:latest" \
-//         //             -e "frontend_image=${DOCKER_REGISTRY}/qcode-frontend:latest" \
-//         //             -e "mongodb_uri=${MONGODB_URI}" \
-//         //             -e "jwt_secret=${JWT_SECRET}"
-//         //             '''
-//         //         }
-//         //     }
-//         // }
+
+//         stage('Deploy to AWS') {
+//             steps {
+//                 script {
+//                     echo "Deploying to AWS..."
+//                 }
+//             }
+//         }
 //     }
     
 //     post {
+//         always {
+//             // Clean up to save memory
+//             sh 'docker system prune -af'
+//             cleanWs()
+//         }
 //         failure {
 //             echo 'Deployment failed!'
 //         }
 //         success {
-//             echo "Deployment completed successfully! Application available at: http://${env.PUBLIC_IP}"
+//             echo "Build completed successfully!"
 //         }
 //     }
 // }
+
 
 
 pipeline {
@@ -109,14 +93,13 @@ pipeline {
         DOCKER_REGISTRY = credentials('DOCKER_HUB_USERNAME')
         MONGODB_URI = credentials('MONGO_URI')
         JWT_SECRET = credentials('SECRET')
-        // EC2_IP = credentials('EC2_IP')
-        // EC2_USER = 'ubuntu'
-        // KEY_PATH = '/var/lib/jenkins/jenkins-a.pem'
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        EC2_IP = '100.29.93.61'
+        EC2_DNS = credentials('EC2_DNS')
+        EC2_INSTANCE_ID = credentials('EC2_INSTANCE_ID')
+        SSH_KEY_PATH = credentials('SSH_KEY_PATH')
     }
-    
-    // tools {
-    //     nodejs 'node:18'
-    // }
     
     stages {
         stage('Checkout') {
@@ -128,12 +111,12 @@ pipeline {
         stage('Test Backend') {
             steps {
                 dir('backend') {
-                    // Limit Node.js memory usage and use less intensive install options
                     sh 'npm install'
                     sh 'npm test'
                 }
             }
         }
+        
         stage('Build Backend') {
             steps {
                 dir('backend') {
@@ -162,10 +145,36 @@ pipeline {
             }
         }
 
-        stage('Deploy to AWS') {
+        stage('Terraform Init and Apply') {
             steps {
-                script {
-                    echo "Deploying to AWS..."
+                dir('terraform') {
+                    // Create a tfvars file dynamically with sensitive data
+                    writeFile file: 'terraform.tfvars', text: """
+instance_id = "${EC2_INSTANCE_ID}"
+"""
+                    sh 'terraform init'
+                    sh 'terraform apply -auto-approve'
+                }
+            }
+        }
+        
+        stage('Ansible Deploy') {
+            steps {
+                dir('ansible') {
+                    // Create inventory file dynamically with instance details
+                    writeFile file: 'inventory.ini', text: """
+[qcode]
+${EC2_IP} ansible_user=ubuntu ansible_ssh_private_key_file=${SSH_KEY_PATH} ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+"""
+                    
+                    // Run Ansible playbook
+                    sh '''
+                    export ANSIBLE_HOST_KEY_CHECKING=False
+                    ansible-playbook -i inventory.ini playbook.yml \
+                    -e "docker_registry=${DOCKER_REGISTRY}" \
+                    -e "mongodb_uri=${MONGODB_URI}" \
+                    -e "jwt_secret=${JWT_SECRET}"
+                    '''
                 }
             }
         }
@@ -173,7 +182,6 @@ pipeline {
     
     post {
         always {
-            // Clean up to save memory
             sh 'docker system prune -af'
             cleanWs()
         }
