@@ -8,7 +8,7 @@ pipeline {
         JWT_SECRET = credentials('SECRET')
         AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-        EC2_IP = credentials('EC2_IP')
+        EC2_IP = '100.29.93.61'
         EC2_DNS = credentials('EC2_DNS')
         EC2_INSTANCE_ID = credentials('EC2_INSTANCE_ID')
     }
