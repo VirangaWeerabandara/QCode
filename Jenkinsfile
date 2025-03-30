@@ -126,29 +126,27 @@ pipeline {
             steps {
                 dir('backend') {
                     // Limit Node.js memory usage and use less intensive install options
-                    sh 'NODE_OPTIONS="--max-old-space-size=512" npm install --no-optional --no-bin-links'
-                    sh 'NODE_OPTIONS="--max-old-space-size=512" npm test || true'
+                    sh 'npm install'
+                    sh 'npm test'
+                }
+            }
+        }
+        stage('Build Backend') {
+            steps {
+                dir('backend') {
+                    sh 'docker build -t ${DOCKER_REGISTRY}/qcode-backend:latest .'
                 }
             }
         }
         
-        // stage('Build Backend') {
-        //     steps {
-        //         dir('backend') {
-        //             // Add memory limits to Docker
-        //             sh 'docker build --memory=512m --memory-swap=512m -t ${DOCKER_REGISTRY}/qcode-backend:latest .'
-        //         }
-        //     }
-        // }
+        stage('Build Frontend') {
+            steps {
+                dir('frontend') {
+                    sh 'docker build -t ${DOCKER_REGISTRY}/qcode-frontend:latest .'
+                }
+            }
+        }
         
-        // stage('Build Frontend') {
-        //     steps {
-        //         dir('frontend') {
-        //             // Add memory limits to Docker
-        //             sh 'docker build --memory=512m --memory-swap=512m -t ${DOCKER_REGISTRY}/qcode-frontend:latest .'
-        //         }
-        //     }
-        // }
         
         // stage('Push Images') {
         //     steps {
