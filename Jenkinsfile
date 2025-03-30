@@ -109,9 +109,9 @@ pipeline {
         DOCKER_REGISTRY = credentials('DOCKER_HUB_USERNAME')
         MONGODB_URI = credentials('MONGO_URI')
         JWT_SECRET = credentials('SECRET')
-        EC2_IP = credentials('EC2_IP')
-        EC2_USER = 'ubuntu'
-        KEY_PATH = '/var/lib/jenkins/jenkins-a.pem'
+        // EC2_IP = credentials('EC2_IP')
+        // EC2_USER = 'ubuntu'
+        // KEY_PATH = '/var/lib/jenkins/jenkins-a.pem'
     }
     
     // tools {
