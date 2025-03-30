@@ -109,6 +109,9 @@ pipeline {
         DOCKER_REGISTRY = credentials('DOCKER_HUB_USERNAME')
         MONGODB_URI = credentials('MONGO_URI')
         JWT_SECRET = credentials('SECRET')
+        EC2_IP = credentials('EC2_IP')
+        EC2_USER = 'ubuntu'
+        KEY_PATH = '/var/lib/jenkins/jenkins-a.pem'
     }
     
     tools {
@@ -147,18 +150,25 @@ pipeline {
             }
         }
         
-        
-        // stage('Push Images') {
-        //     steps {
-        //         withCredentials([string(credentialsId: 'docker-hub-password', variable: 'DOCKER_HUB_PASSWORD')]) {
-        //             sh '''
-        //             echo $DOCKER_HUB_PASSWORD | docker login -u ${DOCKER_REGISTRY} --password-stdin
-        //             docker push ${DOCKER_REGISTRY}/qcode-backend:latest
-        //             docker push ${DOCKER_REGISTRY}/qcode-frontend:latest
-        //             '''
-        //         }
-        //     }
-        // }
+        stage('Push Images') {
+            steps {
+                withCredentials([string(credentialsId: 'docker-hub-password', variable: 'DOCKER_HUB_PASSWORD')]) {
+                    sh '''
+                    echo $DOCKER_HUB_PASSWORD | docker login -u ${DOCKER_REGISTRY} --password-stdin
+                    docker push ${DOCKER_REGISTRY}/qcode-backend:latest
+                    docker push ${DOCKER_REGISTRY}/qcode-frontend:latest
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to AWS') {
+            steps {
+                script {
+                    echo "Deploying to AWS..."
+                }
+            }
+        }
     }
     
     post {
