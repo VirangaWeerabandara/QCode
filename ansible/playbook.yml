@@ -13,11 +13,7 @@
         name:
           - docker.io
           - python3-docker
-        state: present
-
-    - name: Install Docker Python module
-      pip:
-        name: docker
+          - docker-compose
         state: present
 
     - name: Ensure Docker service is running
@@ -50,7 +46,29 @@
         - "{{ docker_registry }}/qcode-backend:latest"
         - "{{ docker_registry }}/qcode-frontend:latest"
 
+    - name: Add ubuntu user to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Reset ssh connection to allow user changes to affect the current session
+      meta: reset_connection
+
     - name: Run docker-compose
+      become: true
+      become_user: ubuntu
       command: docker-compose up -d
       args:
         chdir: /home/ubuntu/qcode
+
+    - name: Verify containers are running
+      become_user: ubuntu
+      command: docker ps
+      args:
+        chdir: /home/ubuntu/qcode
+      register: docker_ps_result
+
+    - name: Show running containers
+      debug:
+        var: docker_ps_result.stdout_lines
