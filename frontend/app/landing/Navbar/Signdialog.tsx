@@ -112,7 +112,7 @@ const SignDialog: React.FC = () => {
         <button
           type="button"
           onClick={openModal}
-          className="className=rounded-md border border-Blueviolet px-4 py-4 text-sm font-medium text-Blueviolet hover:bg-opacity-10 hover:bg-Blueviolet focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+          className="rounded-full border border-Blueviolet px-6 py-2 text-sm font-medium text-Blueviolet hover:bg-Blueviolet hover:text-white hover:bg-opacity-90 transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-Blueviolet focus-visible:ring-opacity-75"
         >
           Sign In
         </button>
