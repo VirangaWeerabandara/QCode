@@ -33,7 +33,7 @@ app.use((req, res, next) => {
 
 // routes
 // app.use("/quiz", quizRoutes);
-app.use("/user", userRoutes);
+app.use("/api/user", userRoutes);
 
 // connect to mongodb
 mongoose
