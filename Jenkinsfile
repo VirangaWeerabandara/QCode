@@ -88,11 +88,11 @@ ${EC2_IP} ansible_user=ubuntu ansible_ssh_private_key_file=${WORKSPACE}/ansible/
                         
                         // Run Ansible playbook
                         sh '''
-                        export ANSIBLE_HOST_KEY_CHECKING=False
                         ansible-playbook -i inventory.ini playbook.yml \
                         -e "docker_registry=${DOCKER_REGISTRY}" \
                         -e "mongodb_uri=${MONGODB_URI}" \
-                        -e "jwt_secret=${JWT_SECRET}"
+                        -e "jwt_secret=${JWT_SECRET}" \
+                        -e "image_tag=${BUILD_VERSION}"
                         '''
                         
                         // Clean up the key file
