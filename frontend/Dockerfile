@@ -8,7 +8,9 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 # Install dependencies
-RUN npm ci
+ENV NODE_OPTIONS="--max-old-space-size=512"
+RUN npm ci --no-audit --silent && \
+    npm cache clean --force
 
 # Copy application code
 COPY . .
@@ -23,6 +25,7 @@ WORKDIR /app
 
 ENV NODE_ENV production
 ENV PORT 3000
+ENV NODE_OPTIONS="--max-old-space-size=256"
 
 # Copy necessary files from builder stage
 COPY --from=builder /app/public ./public

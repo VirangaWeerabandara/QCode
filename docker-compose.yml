@@ -12,6 +12,15 @@ services:
     restart: always
     networks:
       - qcode-network
+    # Add resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: "0.4"
+          memory: 300M
+        reservations:
+          cpus: "0.1"
+          memory: 150M
 
   frontend:
     build: ./frontend
@@ -26,6 +35,15 @@ services:
     restart: always
     networks:
       - qcode-network
+    # Add resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: "0.4"
+          memory: 400M
+        reservations:
+          cpus: "0.1"
+          memory: 200M
 
 networks:
   qcode-network:
