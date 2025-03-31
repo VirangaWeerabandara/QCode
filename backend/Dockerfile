@@ -7,7 +7,12 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm ci --only=production --no-cache --silent && \
+    npm cache clean --force
+
+# Set Node options to limit memory usage
+ENV NODE_OPTIONS="--max-old-space-size=256 --max-semi-space-size=2"
+ENV NODE_ENV=production
 
 # Copy application code
 COPY . .
