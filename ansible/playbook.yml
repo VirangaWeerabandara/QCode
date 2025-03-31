@@ -69,8 +69,8 @@
       become: true
       become_user: ubuntu
       shell: |
-        docker pull {{ docker_registry }}/qcode-backend:latest
-        docker pull {{ docker_registry }}/qcode-frontend:latest
+        docker pull {{ docker_registry }}/qcode-backend:{{ image_tag }}
+        docker pull {{ docker_registry }}/qcode-frontend:{{ image_tag }}
       args:
         chdir: /home/ubuntu/qcode
 
