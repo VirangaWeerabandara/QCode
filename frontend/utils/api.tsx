@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.API_URL || "http://localhost:4000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 export const API_ROUTES = {
   LOGIN: `${API_BASE_URL}/user/login`,
