@@ -1,5 +1,5 @@
 // const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-const API_BASE_URL = "https://qcode.api.altero.dev";
+const API_BASE_URL = "http://100.29.93.61";
 
 export const API_ROUTES = {
   LOGIN: `${API_BASE_URL}/user/login`,
