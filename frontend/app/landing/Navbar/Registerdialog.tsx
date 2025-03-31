@@ -1,6 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import { LockClosedIcon } from "@heroicons/react/20/solid";
+import { API_ROUTES, fetchApi } from "../../../utils/api";
 
 interface FormInputProps {
   value: string;
@@ -123,28 +124,21 @@ const Register = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:4000/api/user/signup", {
+      const data = await fetchApi(API_ROUTES.SIGNUP, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(formData),
       });
 
-      const json = await response.json();
-
-      if (!response.ok) {
-        setError(json.error);
-        setIsLoading(false);
-        return;
-      }
-
       // save the user to local storage
-      localStorage.setItem("user", JSON.stringify(json));
+      localStorage.setItem("user", JSON.stringify(data));
       setIsLoading(false);
       closeModal();
     } catch (error) {
-      setError("An error occurred during registration");
+      setError(
+        error instanceof Error
+          ? error.message
+          : "An error occurred during registration"
+      );
       setIsLoading(false);
     }
   };
