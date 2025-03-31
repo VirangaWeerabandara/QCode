@@ -21,7 +21,13 @@
         name: docker
         state: started
         enabled: yes
-
+    - name: Stop and remove existing containers
+      shell: |
+        docker-compose down -v
+        docker system prune -f
+      args:
+        chdir: /path/to/app/directory
+      ignore_errors: true
     - name: Create app directory
       file:
         path: /home/ubuntu/qcode
