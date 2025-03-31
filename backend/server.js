@@ -9,7 +9,7 @@ const userRoutes = require("./routes/user");
 // create express app
 const app = express();
 
-const allowedOrigins = [process.env.CORS_ORIGIN];
+const allowedOrigins = process.env.CORS_ORIGIN.split(",");
 
 app.use(
   cors({
@@ -32,8 +32,8 @@ app.use((req, res, next) => {
 });
 
 // routes
-// app.use("/api/quiz", quizRoutes);
-app.use("/api/user", userRoutes);
+// app.use("/quiz", quizRoutes);
+app.use("/user", userRoutes);
 
 // connect to mongodb
 mongoose

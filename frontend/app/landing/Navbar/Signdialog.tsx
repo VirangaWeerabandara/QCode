@@ -3,6 +3,7 @@ import { Fragment, useState } from "react";
 import { LockClosedIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { API_ROUTES, fetchApi } from "../../../utils/api";
 
 interface InputProps {
   value: string;
@@ -75,21 +76,10 @@ const SignDialog: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:4000/api/user/login", {
+      const data = await fetchApi<LoginResponse>(API_ROUTES.LOGIN, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({ email, password }),
       });
-
-      const data = (await response.json()) as LoginResponse;
-
-      if (!response.ok) {
-        setError(isApiError(data) ? data.error : "Login failed");
-        setIsLoading(false);
-        return;
-      }
 
       // Store user data and token
       localStorage.setItem("user", JSON.stringify(data));
