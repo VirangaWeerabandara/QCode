@@ -145,15 +145,14 @@ const Register = () => {
 
   return (
     <>
-      <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:pr-0">
-        <div className="hidden lg:block">
-          <button
-            className="text-Blueviolet text-lg font-medium ml-9 py-5 px-16 transition duration-150 ease-in-out rounded-full bg-semiblueviolet hover:text-white hover:bg-Blueviolet"
-            onClick={openModal}
-          >
-            Sign up
-          </button>
-        </div>
+      <div className="ml-4">
+        <button
+          type="button"
+          onClick={openModal}
+          className="rounded-full bg-semiblueviolet px-6 py-2 text-sm font-medium text-Blueviolet hover:bg-Blueviolet hover:text-white transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-Blueviolet focus-visible:ring-opacity-75"
+        >
+          Sign Up
+        </button>
       </div>
 
       <Transition appear show={isOpen} as={Fragment}>
@@ -223,23 +222,6 @@ const Register = () => {
                             value={formData.password}
                             onChange={handleChange}
                           />
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <input
-                              id="remember-me"
-                              name="remember-me"
-                              type="checkbox"
-                              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                            />
-                            <label
-                              htmlFor="remember-me"
-                              className="ml-2 block text-sm text-gray-900"
-                            >
-                              Remember me
-                            </label>
-                          </div>
                         </div>
 
                         <div>
