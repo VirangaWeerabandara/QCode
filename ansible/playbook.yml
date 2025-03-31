@@ -21,13 +21,14 @@
         name: docker
         state: started
         enabled: yes
+
+    # Fix the cleanup path to point to the correct directory
     - name: Stop and remove existing containers
       shell: |
-        docker-compose down -v
+        cd /home/ubuntu/qcode && docker-compose down -v || true
         docker system prune -f
-      args:
-        chdir: /path/to/app/directory
       ignore_errors: true
+
     - name: Create app directory
       file:
         path: /home/ubuntu/qcode
