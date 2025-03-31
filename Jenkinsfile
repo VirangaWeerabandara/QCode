@@ -11,6 +11,7 @@ pipeline {
         EC2_IP = '100.29.93.61'
         EC2_DNS = credentials('EC2_DNS')
         EC2_INSTANCE_ID = credentials('EC2_INSTANCE_ID')
+        BUILD_VERSION = "${env.BUILD_NUMBER}"
     }
     
     stages {
@@ -32,7 +33,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('backend') {
-                    sh 'docker build -t ${DOCKER_REGISTRY}/qcode-backend:latest .'
+                    sh 'docker build -t ${DOCKER_REGISTRY}/qcode-backend:${BUILD_VERSION} .'
                 }
             }
         }
@@ -40,7 +41,7 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 dir('frontend') {
-                    sh 'docker build -t ${DOCKER_REGISTRY}/qcode-frontend:latest .'
+                    sh 'docker build -t ${DOCKER_REGISTRY}/qcode-frontend:${BUILD_VERSION} .'
                 }
             }
         }
@@ -50,8 +51,8 @@ pipeline {
                 withCredentials([string(credentialsId: 'docker-hub-password', variable: 'DOCKER_HUB_PASSWORD')]) {
                     sh '''
                     echo $DOCKER_HUB_PASSWORD | docker login -u ${DOCKER_REGISTRY} --password-stdin
-                    docker push ${DOCKER_REGISTRY}/qcode-backend:latest
-                    docker push ${DOCKER_REGISTRY}/qcode-frontend:latest
+                    docker push ${DOCKER_REGISTRY}/qcode-backend:${BUILD_VERSION}
+                    docker push ${DOCKER_REGISTRY}/qcode-frontend:${BUILD_VERSION}
                     '''
                 }
             }

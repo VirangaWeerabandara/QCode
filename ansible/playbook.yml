@@ -2,6 +2,8 @@
 - name: Deploy QCode Application
   hosts: qcode
   become: true
+  vars:
+    deployment_timestamp: "{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"
 
   tasks:
     - name: Update apt cache
@@ -22,11 +24,18 @@
         state: started
         enabled: yes
 
-    # Fix the cleanup path to point to the correct directory
     - name: Stop and remove existing containers
       shell: |
-        cd /home/ubuntu/qcode && docker-compose down -v || true
-        docker system prune -f
+        cd /home/ubuntu/qcode && docker-compose down --remove-orphans || true
+      ignore_errors: true
+
+    - name: Remove old Docker images to ensure fresh deployment
+      shell: |
+        docker image rm {{ docker_registry }}/qcode-backend:latest {{ docker_registry }}/qcode-frontend:latest || true
+      ignore_errors: true
+
+    - name: Prune Docker system
+      shell: docker system prune -f
       ignore_errors: true
 
     - name: Create app directory
@@ -37,21 +46,15 @@
         group: ubuntu
         mode: "0755"
 
-    - name: Create docker-compose.yml
+    - name: Create docker-compose.yml with cache-busting timestamp
       template:
         src: templates/docker-compose.yml.j2
         dest: /home/ubuntu/qcode/docker-compose.yml
         owner: ubuntu
         group: ubuntu
         mode: "0644"
-
-    - name: Pull Docker images
-      docker_image:
-        name: "{{ item }}"
-        source: pull
-      loop:
-        - "{{ docker_registry }}/qcode-backend:latest"
-        - "{{ docker_registry }}/qcode-frontend:latest"
+      vars:
+        build_timestamp: "{{ deployment_timestamp }}"
 
     - name: Add ubuntu user to docker group
       user:
@@ -62,12 +65,25 @@
     - name: Reset ssh connection to allow user changes to affect the current session
       meta: reset_connection
 
-    - name: Run docker-compose
+    - name: Pull latest Docker images with force
       become: true
       become_user: ubuntu
-      command: docker-compose up -d
+      shell: |
+        docker pull {{ docker_registry }}/qcode-backend:latest
+        docker pull {{ docker_registry }}/qcode-frontend:latest
       args:
         chdir: /home/ubuntu/qcode
+
+    - name: Run docker-compose with force recreate
+      become: true
+      become_user: ubuntu
+      shell: docker-compose up -d --force-recreate
+      args:
+        chdir: /home/ubuntu/qcode
+
+    - name: Wait for containers to stabilize
+      pause:
+        seconds: 10
 
     - name: Verify containers are running
       become_user: ubuntu
@@ -79,3 +95,14 @@
     - name: Show running containers
       debug:
         var: docker_ps_result.stdout_lines
+
+    - name: Check container logs for errors
+      become_user: ubuntu
+      shell: "docker-compose logs --tail=50"
+      args:
+        chdir: /home/ubuntu/qcode
+      register: container_logs
+
+    - name: Display container logs
+      debug:
+        var: container_logs.stdout_lines
