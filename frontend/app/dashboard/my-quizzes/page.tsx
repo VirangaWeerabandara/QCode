@@ -49,9 +49,9 @@ export default function MyQuizzes() {
   ]);
 
   const [isDeleting, setIsDeleting] = useState(false);
-  const [selectedQuiz, setSelectedQuiz] = useState(null);
+  const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
 
-  const toggleQuizStatus = (id) => {
+  const toggleQuizStatus = (id: number) => {
     setQuizzes(
       quizzes.map((quiz) =>
         quiz.id === id ? { ...quiz, active: !quiz.active } : quiz
@@ -59,15 +59,26 @@ export default function MyQuizzes() {
     );
   };
 
-  const confirmDelete = (quiz) => {
+  type Quiz = {
+    id: number;
+    title: string;
+    questionsCount: number;
+    participants: number;
+    date: string;
+    active: boolean;
+  };
+
+  const confirmDelete = (quiz: Quiz) => {
     setSelectedQuiz(quiz);
     setIsDeleting(true);
   };
 
   const deleteQuiz = () => {
-    setQuizzes(quizzes.filter((quiz) => quiz.id !== selectedQuiz.id));
-    setIsDeleting(false);
-    setSelectedQuiz(null);
+    if (selectedQuiz) {
+      setQuizzes(quizzes.filter((quiz) => quiz.id !== selectedQuiz.id));
+      setIsDeleting(false);
+      setSelectedQuiz(null);
+    }
   };
 
   const cancelDelete = () => {

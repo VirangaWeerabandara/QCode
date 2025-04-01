@@ -18,13 +18,13 @@ export default function CreateQuiz() {
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleQuestionChange = (id, field, value) => {
+  const handleQuestionChange = (id: number, field: string, value: string | number) => {
     setQuestions(
       questions.map((q) => (q.id === id ? { ...q, [field]: value } : q))
     );
   };
 
-  const handleOptionChange = (questionId, optionIndex, value) => {
+  const handleOptionChange = (questionId: number, optionIndex: number, value: string) => {
     setQuestions(
       questions.map((q) => {
         if (q.id === questionId) {
@@ -37,7 +37,7 @@ export default function CreateQuiz() {
     );
   };
 
-  const addOption = (questionId) => {
+  const addOption = (questionId: number) => {
     setQuestions(
       questions.map((q) => {
         if (q.id === questionId && q.options.length < 6) {
@@ -48,7 +48,7 @@ export default function CreateQuiz() {
     );
   };
 
-  const removeOption = (questionId, optionIndex) => {
+  const removeOption = (questionId: number, optionIndex: number) => {
     setQuestions(
       questions.map((q) => {
         if (q.id === questionId && q.options.length > 2) {
@@ -89,13 +89,13 @@ export default function CreateQuiz() {
     ]);
   };
 
-  const removeQuestion = (id) => {
+  const removeQuestion = (id: number) => {
     if (questions.length > 1) {
       setQuestions(questions.filter((q) => q.id !== id));
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Validate before submitting

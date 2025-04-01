@@ -32,14 +32,13 @@ export default function DashboardLayout({
       path: "/dashboard/my-quizzes",
       icon: DocumentTextIcon,
     },
-    { name: "Analytics", path: "/dashboard/analytics", icon: ChartBarIcon },
     { name: "Settings", path: "/dashboard/settings", icon: CogIcon },
   ];
 
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <div className="w-64 bg-white shadow-md">
+      <div className="w-64 bg-semiblueviolet text-Blueviolet shadow-md">
         <div className="p-4 border-b">
           <Link href="/">
             <Image
