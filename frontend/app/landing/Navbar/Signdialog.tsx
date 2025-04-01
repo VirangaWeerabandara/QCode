@@ -89,6 +89,9 @@ const SignDialog: React.FC = () => {
       setPassword("");
       setIsLoading(false);
       setIsOpen(false);
+
+      // Redirect to dashboard after successful login
+      router.push("/dashboard");
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to connect to server"
