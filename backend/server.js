@@ -3,7 +3,7 @@ require("dotenv").config();
 const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
-// const quizRoutes = require("./routes/quiz");
+const quizRoutes = require("./routes/quiz"); 
 const userRoutes = require("./routes/user");
 
 // create express app
@@ -20,19 +20,19 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   })
 );
 
 // middleware
 app.use(express.json());
 app.use((req, res, next) => {
-  console.log(req.path, res.path);
+  console.log(req.path, req.method);
   next();
 });
 
 // routes
-// app.use("/quiz", quizRoutes);
+app.use("/api/quiz", quizRoutes); 
 app.use("/api/user", userRoutes);
 
 // connect to mongodb
