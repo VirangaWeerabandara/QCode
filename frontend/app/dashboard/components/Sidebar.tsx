@@ -13,14 +13,12 @@ import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
 } from "@heroicons/react/24/outline";
+import { useAuth } from "../../context/AuthContext";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function SideBar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = React.useState(false);
+  const { logout } = useAuth(); 
 
   const navItems = [
     { name: "Dashboard", path: "/dashboard", icon: HomeIcon },
@@ -37,6 +35,7 @@ export default function DashboardLayout({
     { name: "Settings", path: "/dashboard/settings", icon: CogIcon },
   ];
 
+  // Rest of the component stays the same until the Logout button
 
   return (
     <>
@@ -61,6 +60,7 @@ export default function DashboardLayout({
         aria-label="Sidebar"
       >
         <div className="h-full px-3 py-4 overflow-y-auto bg-white text-midnightblue shadow-md">
+          {/* Logo and navigation items stay the same */}
           <div className="flex justify-center items-center mb-5 pt-2 pb-4 border-b border-Blueviolet/30">
             <Link href="/">
               <Image
@@ -107,13 +107,14 @@ export default function DashboardLayout({
           </ul>
 
           <div className="absolute bottom-0 left-0 w-full border-t border-Blueviolet/30 p-4">
-            <Link
-              href="/landing"
-              className="flex items-center p-2 rounded-lg text-red hover:bg-red/10 group transition duration-75"
+            {/* Update to button with onClick handler */}
+            <button
+              onClick={logout}
+              className="flex w-full items-center p-2 rounded-lg text-red hover:bg-red/10 group transition duration-75"
             >
               <ArrowRightOnRectangleIcon className="w-5 h-5 text-red group-hover:text-red transition duration-75" />
               <span className="ms-3">Logout</span>
-            </Link>
+            </button>
           </div>
         </div>
       </aside>

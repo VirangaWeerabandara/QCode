@@ -14,9 +14,9 @@ export default function DashboardLayout({
   const router = useRouter();
 
   useEffect(() => {
-    // If authentication check is done and no user is found, redirect to login
+    // If authentication check is done and no user is found, redirect to landing
     if (!isLoading && !user) {
-      router.push("/login");
+      router.push("/landing");
     }
   }, [user, isLoading, router]);
 
