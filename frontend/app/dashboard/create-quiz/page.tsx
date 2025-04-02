@@ -18,13 +18,21 @@ export default function CreateQuiz() {
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleQuestionChange = (id: number, field: string, value: string | number) => {
+  const handleQuestionChange = (
+    id: number,
+    field: string,
+    value: string | number
+  ) => {
     setQuestions(
       questions.map((q) => (q.id === id ? { ...q, [field]: value } : q))
     );
   };
 
-  const handleOptionChange = (questionId: number, optionIndex: number, value: string) => {
+  const handleOptionChange = (
+    questionId: number,
+    optionIndex: number,
+    value: string
+  ) => {
     setQuestions(
       questions.map((q) => {
         if (q.id === questionId) {
@@ -130,17 +138,6 @@ export default function CreateQuiz() {
         questions,
       });
 
-      // Example API call:
-      // const response = await fetch('/api/quizzes', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     title: quizTitle,
-      //     description: quizDescription,
-      //     questions
-      //   }),
-      // });
-
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -169,15 +166,17 @@ export default function CreateQuiz() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Create New Quiz</h1>
+      <h1 className="text-2xl font-bold mb-6 text-midnightblue">
+        Create New Quiz
+      </h1>
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white shadow-md rounded-lg p-6"
+        className="bg-white shadow-md rounded-lg p-6 border border-grey500/30"
       >
         <div className="mb-6">
           <label
-            className="block text-gray-700 text-sm font-bold mb-2"
+            className="block text-midnightblue text-sm font-bold mb-2"
             htmlFor="quiz-title"
           >
             Quiz Title
@@ -187,7 +186,7 @@ export default function CreateQuiz() {
             type="text"
             value={quizTitle}
             onChange={(e) => setQuizTitle(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="shadow-sm border border-grey500/50 rounded w-full py-2 px-3 text-midnightblue leading-tight focus:outline-none focus:ring-2 focus:ring-Blueviolet"
             placeholder="Enter quiz title"
             required
           />
@@ -195,7 +194,7 @@ export default function CreateQuiz() {
 
         <div className="mb-6">
           <label
-            className="block text-gray-700 text-sm font-bold mb-2"
+            className="block text-midnightblue text-sm font-bold mb-2"
             htmlFor="quiz-description"
           >
             Quiz Description (Optional)
@@ -204,30 +203,34 @@ export default function CreateQuiz() {
             id="quiz-description"
             value={quizDescription}
             onChange={(e) => setQuizDescription(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="shadow-sm border border-grey500/50 rounded w-full py-2 px-3 text-midnightblue leading-tight focus:outline-none focus:ring-2 focus:ring-Blueviolet"
             placeholder="Enter quiz description"
             rows={3}
           />
         </div>
 
         <div className="mb-6">
-          <h2 className="text-lg font-bold mb-4">Questions</h2>
+          <h2 className="text-lg font-bold mb-4 text-midnightblue">
+            Questions
+          </h2>
 
           {questions.map((question, index) => (
             <div
               key={question.id}
-              className="mb-8 p-4 border rounded-lg bg-gray-50"
+              className="mb-8 p-4 border rounded-lg bg-lightkblue border-grey500/30"
             >
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold">Question {index + 1}</h3>
+                <h3 className="font-bold text-midnightblue">
+                  Question {index + 1}
+                </h3>
                 <button
                   type="button"
                   onClick={() => removeQuestion(question.id)}
                   disabled={questions.length === 1}
                   className={`p-1 rounded-full ${
                     questions.length === 1
-                      ? "text-gray-400 cursor-not-allowed"
-                      : "text-red-500 hover:bg-red-100"
+                      ? "text-lightgray cursor-not-allowed"
+                      : "text-red hover:bg-red/10"
                   }`}
                   title="Remove question"
                 >
@@ -236,7 +239,7 @@ export default function CreateQuiz() {
               </div>
 
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">
+                <label className="block text-midnightblue text-sm font-bold mb-2">
                   Question Text
                 </label>
                 <input
@@ -249,14 +252,14 @@ export default function CreateQuiz() {
                       e.target.value
                     )
                   }
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="shadow-sm border border-grey500/50 rounded w-full py-2 px-3 text-midnightblue leading-tight focus:outline-none focus:ring-2 focus:ring-Blueviolet"
                   placeholder="Enter your question"
                   required
                 />
               </div>
 
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">
+                <label className="block text-midnightblue text-sm font-bold mb-2">
                   Question Type
                 </label>
                 <select
@@ -264,7 +267,7 @@ export default function CreateQuiz() {
                   onChange={(e) =>
                     handleQuestionChange(question.id, "type", e.target.value)
                   }
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="shadow-sm border border-grey500/50 rounded w-full py-2 px-3 text-midnightblue leading-tight focus:outline-none focus:ring-2 focus:ring-Blueviolet"
                 >
                   <option value="multiple-choice">Multiple Choice</option>
                   <option value="true-false">True/False</option>
@@ -274,11 +277,11 @@ export default function CreateQuiz() {
 
               {question.type === "true-false" ? (
                 <div className="mb-4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">
+                  <label className="block text-midnightblue text-sm font-bold mb-2">
                     Correct Answer
                   </label>
                   <div className="flex items-center">
-                    <label className="mr-4">
+                    <label className="mr-4 text-midnightblue">
                       <input
                         type="radio"
                         name={`correct-${question.id}`}
@@ -286,11 +289,11 @@ export default function CreateQuiz() {
                         onChange={() =>
                           handleQuestionChange(question.id, "correctAnswer", 0)
                         }
-                        className="mr-2"
+                        className="mr-2 text-Blueviolet focus:ring-Blueviolet"
                       />
                       True
                     </label>
-                    <label>
+                    <label className="text-midnightblue">
                       <input
                         type="radio"
                         name={`correct-${question.id}`}
@@ -298,7 +301,7 @@ export default function CreateQuiz() {
                         onChange={() =>
                           handleQuestionChange(question.id, "correctAnswer", 1)
                         }
-                        className="mr-2"
+                        className="mr-2 text-Blueviolet focus:ring-Blueviolet"
                       />
                       False
                     </label>
@@ -306,7 +309,7 @@ export default function CreateQuiz() {
                 </div>
               ) : (
                 <div className="mb-4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">
+                  <label className="block text-midnightblue text-sm font-bold mb-2">
                     Options
                   </label>
 
@@ -323,7 +326,7 @@ export default function CreateQuiz() {
                             optionIndex
                           )
                         }
-                        className="mr-3"
+                        className="mr-3 text-Blueviolet focus:ring-Blueviolet"
                       />
                       <input
                         type="text"
@@ -335,7 +338,7 @@ export default function CreateQuiz() {
                             e.target.value
                           )
                         }
-                        className="shadow appearance-none border rounded flex-1 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow-sm border border-grey500/50 rounded flex-1 py-2 px-3 text-midnightblue leading-tight focus:outline-none focus:ring-2 focus:ring-Blueviolet"
                         placeholder={`Option ${optionIndex + 1}`}
                         required
                       />
@@ -346,8 +349,8 @@ export default function CreateQuiz() {
                         disabled={question.options.length <= 2}
                         className={`ml-2 p-1 rounded-full ${
                           question.options.length <= 2
-                            ? "text-gray-400 cursor-not-allowed"
-                            : "text-red-500 hover:bg-red-100"
+                            ? "text-lightgray cursor-not-allowed"
+                            : "text-red hover:bg-red/10"
                         }`}
                         title="Remove option"
                       >
@@ -360,7 +363,7 @@ export default function CreateQuiz() {
                     <button
                       type="button"
                       onClick={() => addOption(question.id)}
-                      className="mt-2 flex items-center text-blue-500 hover:text-blue-700"
+                      className="mt-2 flex items-center text-Blueviolet hover:text-midnightblue transition duration-150"
                     >
                       <PlusCircleIcon className="h-5 w-5 mr-1" />
                       Add Option
@@ -370,7 +373,7 @@ export default function CreateQuiz() {
               )}
 
               <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2">
+                <label className="block text-midnightblue text-sm font-bold mb-2">
                   Points
                 </label>
                 <input
@@ -385,7 +388,7 @@ export default function CreateQuiz() {
                       parseInt(e.target.value, 10)
                     )
                   }
-                  className="shadow appearance-none border rounded w-20 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="shadow-sm border border-grey500/50 rounded w-20 py-2 px-3 text-midnightblue leading-tight focus:outline-none focus:ring-2 focus:ring-Blueviolet"
                 />
               </div>
             </div>
@@ -394,7 +397,7 @@ export default function CreateQuiz() {
           <button
             type="button"
             onClick={addQuestion}
-            className="flex items-center text-blue-500 hover:text-blue-700 mb-6"
+            className="flex items-center text-Blueviolet hover:text-midnightblue transition duration-150 mb-6"
           >
             <PlusCircleIcon className="h-5 w-5 mr-1" />
             Add Another Question
@@ -404,14 +407,14 @@ export default function CreateQuiz() {
         <div className="flex justify-end">
           <button
             type="button"
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
+            className="bg-grey500 hover:bg-grey500/80 text-midnightblue font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-Blueviolet mr-2 transition duration-150"
             onClick={() => window.history.back()}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="bg-Blueviolet hover:bg-midnightblue text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-Blueviolet transition duration-150"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Saving..." : "Save Quiz"}

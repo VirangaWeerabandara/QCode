@@ -89,10 +89,10 @@ export default function MyQuizzes() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">My Quizzes</h1>
+        <h1 className="text-2xl font-bold text-midnightblue">My Quizzes</h1>
         <Link
           href="/dashboard/create-quiz"
-          className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="flex items-center bg-Blueviolet hover:bg-midnightblue text-white font-bold py-2 px-4 rounded transition duration-150"
         >
           <PlusCircleIcon className="h-5 w-5 mr-2" />
           Create New Quiz
@@ -100,81 +100,84 @@ export default function MyQuizzes() {
       </div>
 
       {quizzes.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-500 mb-4">
+        <div className="bg-white rounded-lg shadow-md p-8 text-center border border-grey500/30">
+          <p className="text-lightgray mb-4">
             You haven't created any quizzes yet.
           </p>
           <Link
             href="/dashboard/create-quiz"
-            className="inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="inline-flex items-center bg-Blueviolet hover:bg-midnightblue text-white font-bold py-2 px-4 rounded transition duration-150"
           >
             <PlusCircleIcon className="h-5 w-5 mr-2" />
             Create Your First Quiz
           </Link>
         </div>
       ) : (
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+        <div className="bg-white shadow-md rounded-lg overflow-hidden border border-grey500/30">
+          <table className="min-w-full divide-y divide-grey500">
+            <thead className="bg-lightkblue">
               <tr>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-medium text-midnightblue uppercase tracking-wider"
                 >
                   Quiz
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-medium text-midnightblue uppercase tracking-wider"
                 >
                   Questions
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-medium text-midnightblue uppercase tracking-wider"
                 >
                   Participants
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-medium text-midnightblue uppercase tracking-wider"
                 >
                   Created
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-medium text-midnightblue uppercase tracking-wider"
                 >
                   Status
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-right text-xs font-medium text-midnightblue uppercase tracking-wider"
                 >
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-grey500/30">
               {quizzes.map((quiz) => (
-                <tr key={quiz.id}>
+                <tr
+                  key={quiz.id}
+                  className="hover:bg-lightkblue transition-colors duration-150"
+                >
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="font-medium text-gray-900">
+                    <div className="font-medium text-midnightblue">
                       {quiz.title}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-lightgray">
                       {quiz.questionsCount}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-lightgray">
                       {quiz.participants}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-lightgray">
                       {new Date(quiz.date).toLocaleDateString()}
                     </div>
                   </td>
@@ -182,8 +185,8 @@ export default function MyQuizzes() {
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         quiz.active
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
+                          ? "bg-semiblueviolet text-Blueviolet"
+                          : "bg-grey500 text-midnightblue"
                       }`}
                     >
                       {quiz.active ? "Active" : "Inactive"}
@@ -193,32 +196,28 @@ export default function MyQuizzes() {
                     <div className="flex justify-end items-center space-x-2">
                       <Link
                         href={`/dashboard/preview-quiz/${quiz.id}`}
-                        className="text-gray-500 hover:text-gray-700"
+                        className="text-midnightblue hover:text-Blueviolet transition duration-150"
                         title="Preview Quiz"
                       >
                         <EyeIcon className="h-5 w-5" />
                       </Link>
                       <Link
                         href={`/dashboard/analytics/${quiz.id}`}
-                        className="text-blue-500 hover:text-blue-700"
+                        className="text-midnightblue hover:text-Blueviolet transition duration-150"
                         title="View Analytics"
                       >
                         <ChartBarIcon className="h-5 w-5" />
                       </Link>
                       <Link
                         href={`/dashboard/edit-quiz/${quiz.id}`}
-                        className="text-indigo-500 hover:text-indigo-700"
+                        className="text-midnightblue hover:text-Blueviolet transition duration-150"
                         title="Edit Quiz"
                       >
                         <PencilIcon className="h-5 w-5" />
                       </Link>
                       <button
                         onClick={() => toggleQuizStatus(quiz.id)}
-                        className={`${
-                          quiz.active
-                            ? "text-yellow-500 hover:text-yellow-700"
-                            : "text-green-500 hover:text-green-700"
-                        }`}
+                        className="text-midnightblue hover:text-Blueviolet transition duration-150"
                         title={
                           quiz.active ? "Deactivate Quiz" : "Activate Quiz"
                         }
@@ -227,7 +226,7 @@ export default function MyQuizzes() {
                       </button>
                       <button
                         onClick={() => confirmDelete(quiz)}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-red hover:text-red/70 transition duration-150"
                         title="Delete Quiz"
                       >
                         <TrashIcon className="h-5 w-5" />
@@ -243,26 +242,26 @@ export default function MyQuizzes() {
 
       {/* Delete confirmation modal */}
       {isDeleting && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-midnightblue bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
           <div className="relative bg-white rounded-lg shadow-xl max-w-md mx-auto p-6">
             <div className="text-center">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+              <h3 className="text-lg font-medium text-midnightblue mb-4">
                 Delete Quiz
               </h3>
-              <p className="text-sm text-gray-500 mb-6">
+              <p className="text-sm text-lightgray mb-6">
                 Are you sure you want to delete "{selectedQuiz?.title}"? This
                 action cannot be undone.
               </p>
               <div className="flex justify-center space-x-4">
                 <button
                   onClick={cancelDelete}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded"
+                  className="bg-grey500 hover:bg-grey500/80 text-midnightblue font-bold py-2 px-4 rounded transition duration-150"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={deleteQuiz}
-                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                  className="bg-red hover:bg-red/80 text-white font-bold py-2 px-4 rounded transition duration-150"
                 >
                   Delete
                 </button>

@@ -11,6 +11,7 @@ import {
   ChartBarIcon,
   CogIcon,
   ArrowRightOnRectangleIcon,
+  Bars3Icon,
 } from "@heroicons/react/24/outline";
 
 export default function DashboardLayout({
@@ -19,6 +20,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = React.useState(false);
 
   const navItems = [
     { name: "Dashboard", path: "/dashboard", icon: HomeIcon },
@@ -35,59 +37,91 @@ export default function DashboardLayout({
     { name: "Settings", path: "/dashboard/settings", icon: CogIcon },
   ];
 
+
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <>
+      {/* Mobile menu button */}
+      <button
+        data-drawer-target="separator-sidebar"
+        data-drawer-toggle="separator-sidebar"
+        onClick={() => setCollapsed(!collapsed)}
+        className="inline-flex items-center p-2 mt-2 ms-3 text-sm text-midnightblue rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-Blueviolet"
+        type="button"
+      >
+        <span className="sr-only">Open sidebar</span>
+        <Bars3Icon className="w-6 h-6" aria-hidden="true" />
+      </button>
+
       {/* Sidebar */}
-      <div className="w-64 bg-semiblueviolet text-Blueviolet shadow-md">
-        <div className="p-4 border-b">
-          <Link href="/">
-            <Image
-              src="/assets/logo/logo1.png"
-              alt="QCode"
-              width={120}
-              height={40}
-              priority
-              className="mx-auto"
-            />
-          </Link>
-        </div>
-        <div className="py-4">
-          <ul>
+      <aside
+        id="separator-sidebar"
+        className={`fixed top-0 left-0 z-40 w-64 h-screen transition-transform ${
+          collapsed ? "-translate-x-full" : ""
+        } sm:translate-x-0`}
+        aria-label="Sidebar"
+      >
+        <div className="h-full px-3 py-4 overflow-y-auto bg-white text-midnightblue shadow-md">
+          <div className="flex justify-center items-center mb-5 pt-2 pb-4 border-b border-Blueviolet/30">
+            <Link href="/">
+              <Image
+                src="/assets/logo/logo1.png"
+                alt="QCode"
+                width={120}
+                height={40}
+                priority
+                className="mx-auto"
+              />
+            </Link>
+          </div>
+          <ul className="space-y-2 font-medium">
             {navItems.map((item) => {
               const Icon = item.icon;
+              const isActive = pathname === item.path;
               return (
-                <li key={item.path} className="mb-1">
+                <li key={item.path}>
                   <Link
                     href={item.path}
-                    className={`flex items-center px-4 py-3 mx-2 rounded-lg ${
-                      pathname === item.path
-                        ? "bg-semiblueviolet text-white"
-                        : "text-gray-700 hover:bg-gray-100"
+                    className={`flex items-center p-2 rounded-lg group ${
+                      isActive
+                        ? "bg-[#6252f4] text-white"
+                        : "text-midnightblue hover:bg-semiblueviolet"
                     }`}
                   >
-                    <Icon className="h-5 w-5 mr-3" />
-                    <span>{item.name}</span>
+                    <Icon
+                      className={`w-5 h-5 transition duration-75 ${
+                        isActive
+                          ? "text-white"
+                          : "text-midnightblue group-hover:text-midnightblue"
+                      }`}
+                    />
+                    <span className="ms-3">{item.name}</span>
+                    {item.name === "My Quizzes" && (
+                      <span className="inline-flex items-center justify-center px-2 ms-3 text-sm font-medium text-white bg-Blueviolet rounded-full">
+                        5
+                      </span>
+                    )}
                   </Link>
                 </li>
               );
             })}
           </ul>
+
+          <div className="absolute bottom-0 left-0 w-full border-t border-Blueviolet/30 p-4">
+            <Link
+              href="/landing"
+              className="flex items-center p-2 rounded-lg text-red hover:bg-red/10 group transition duration-75"
+            >
+              <ArrowRightOnRectangleIcon className="w-5 h-5 text-red group-hover:text-red transition duration-75" />
+              <span className="ms-3">Logout</span>
+            </Link>
+          </div>
         </div>
-        <div className="absolute bottom-0 w-64 border-t p-4">
-          <Link
-            href="/landing"
-            className="flex items-center text-red-500 hover:text-red-700"
-          >
-            <ArrowRightOnRectangleIcon className="h-5 w-5 mr-3" />
-            <span>Logout</span>
-          </Link>
-        </div>
-      </div>
+      </aside>
 
       {/* Main content */}
-      <div className="flex-1 overflow-auto">
-        <main className="p-6">{children}</main>
+      <div className="p-4 sm:ml-64">
+        <main className="p-0">{children}</main>
       </div>
-    </div>
+    </>
   );
 }
