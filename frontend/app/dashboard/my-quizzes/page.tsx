@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   PlusCircleIcon,
@@ -10,62 +10,46 @@ import {
   EyeIcon,
   ChartBarIcon,
 } from "@heroicons/react/24/outline";
+import { quizApi, Quiz } from "@/utils/api";
 
 export default function MyQuizzes() {
-  // This would be fetched from the API in a real application
-  const [quizzes, setQuizzes] = useState([
-    {
-      id: 1,
-      title: "JavaScript Fundamentals",
-      questionsCount: 10,
-      participants: 32,
-      date: "2023-12-15",
-      active: true,
-    },
-    {
-      id: 2,
-      title: "React Hooks Quiz",
-      questionsCount: 8,
-      participants: 18,
-      date: "2023-12-10",
-      active: true,
-    },
-    {
-      id: 3,
-      title: "CSS Flexbox Challenge",
-      questionsCount: 12,
-      participants: 24,
-      date: "2023-12-05",
-      active: false,
-    },
-    {
-      id: 4,
-      title: "HTML Basics",
-      questionsCount: 15,
-      participants: 45,
-      date: "2023-11-25",
-      active: false,
-    },
-  ]);
-
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
 
-  const toggleQuizStatus = (id: number) => {
-    setQuizzes(
-      quizzes.map((quiz) =>
-        quiz.id === id ? { ...quiz, active: !quiz.active } : quiz
-      )
-    );
+  useEffect(() => {
+    fetchQuizzes();
+  }, []);
+
+  const fetchQuizzes = async () => {
+    try {
+      setLoading(true);
+      const quizzesData = await quizApi.getQuizzes();
+      setQuizzes(quizzesData);
+    } catch (err) {
+      console.error("Error fetching quizzes:", err);
+      setError("Failed to load quizzes. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  type Quiz = {
-    id: number;
-    title: string;
-    questionsCount: number;
-    participants: number;
-    date: string;
-    active: boolean;
+  const toggleQuizStatus = async (quizId: string) => {
+    try {
+      const result = await quizApi.toggleQuizStatus(quizId);
+
+      // Update the local state to reflect the change
+      setQuizzes(
+        quizzes.map((quiz) =>
+          quiz.quizId === quizId ? { ...quiz, isActive: result.isActive } : quiz
+        )
+      );
+    } catch (err) {
+      console.error("Error toggling quiz status:", err);
+      alert("Failed to update quiz status. Please try again.");
+    }
   };
 
   const confirmDelete = (quiz: Quiz) => {
@@ -73,11 +57,17 @@ export default function MyQuizzes() {
     setIsDeleting(true);
   };
 
-  const deleteQuiz = () => {
-    if (selectedQuiz) {
-      setQuizzes(quizzes.filter((quiz) => quiz.id !== selectedQuiz.id));
+  const deleteQuiz = async () => {
+    if (!selectedQuiz) return;
+
+    try {
+      await quizApi.deleteQuiz(selectedQuiz.quizId);
+      setQuizzes(quizzes.filter((quiz) => quiz.quizId !== selectedQuiz.quizId));
       setIsDeleting(false);
       setSelectedQuiz(null);
+    } catch (err) {
+      console.error("Error deleting quiz:", err);
+      alert("Failed to delete quiz. Please try again.");
     }
   };
 
@@ -85,6 +75,28 @@ export default function MyQuizzes() {
     setIsDeleting(false);
     setSelectedQuiz(null);
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-Blueviolet"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red p-8 bg-white rounded-lg shadow-md">
+        <p>{error}</p>
+        <button
+          onClick={() => fetchQuizzes()}
+          className="mt-4 px-4 py-2 bg-Blueviolet text-white rounded hover:bg-midnightblue"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -133,12 +145,6 @@ export default function MyQuizzes() {
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium text-midnightblue uppercase tracking-wider"
                 >
-                  Participants
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-midnightblue uppercase tracking-wider"
-                >
                   Created
                 </th>
                 <th
@@ -158,68 +164,69 @@ export default function MyQuizzes() {
             <tbody className="bg-white divide-y divide-grey500/30">
               {quizzes.map((quiz) => (
                 <tr
-                  key={quiz.id}
+                  key={quiz._id}
                   className="hover:bg-lightkblue transition-colors duration-150"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="font-medium text-midnightblue">
                       {quiz.title}
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-lightgray">
-                      {quiz.questionsCount}
+                      {quiz.description && quiz.description.length > 50
+                        ? `${quiz.description.substring(0, 50)}...`
+                        : quiz.description}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-lightgray">
-                      {quiz.participants}
+                      {quiz.questions.length}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-lightgray">
-                      {new Date(quiz.date).toLocaleDateString()}
+                      {new Date(quiz.createdAt).toLocaleDateString()}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        quiz.active
+                        quiz.isActive
                           ? "bg-semiblueviolet text-Blueviolet"
                           : "bg-grey500 text-midnightblue"
                       }`}
                     >
-                      {quiz.active ? "Active" : "Inactive"}
+                      {quiz.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end items-center space-x-2">
                       <Link
-                        href={`/dashboard/preview-quiz/${quiz.id}`}
+                        href={`/quiz/${quiz.quizId}`}
                         className="text-midnightblue hover:text-Blueviolet transition duration-150"
                         title="Preview Quiz"
+                        target="_blank"
                       >
                         <EyeIcon className="h-5 w-5" />
                       </Link>
                       <Link
-                        href={`/dashboard/analytics/${quiz.id}`}
+                        href={`/dashboard/analytics/${quiz.quizId}`}
                         className="text-midnightblue hover:text-Blueviolet transition duration-150"
                         title="View Analytics"
                       >
                         <ChartBarIcon className="h-5 w-5" />
                       </Link>
                       <Link
-                        href={`/dashboard/edit-quiz/${quiz.id}`}
+                        href={`/dashboard/edit-quiz/${quiz.quizId}`}
                         className="text-midnightblue hover:text-Blueviolet transition duration-150"
                         title="Edit Quiz"
                       >
                         <PencilIcon className="h-5 w-5" />
                       </Link>
                       <button
-                        onClick={() => toggleQuizStatus(quiz.id)}
+                        onClick={() => toggleQuizStatus(quiz.quizId)}
                         className="text-midnightblue hover:text-Blueviolet transition duration-150"
                         title={
-                          quiz.active ? "Deactivate Quiz" : "Activate Quiz"
+                          quiz.isActive ? "Deactivate Quiz" : "Activate Quiz"
                         }
                       >
                         <ArrowPathIcon className="h-5 w-5" />

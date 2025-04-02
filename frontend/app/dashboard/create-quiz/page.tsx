@@ -1,22 +1,28 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { PlusCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { quizApi } from "@/utils/api";
 
 export default function CreateQuiz() {
+  const router = useRouter();
   const [quizTitle, setQuizTitle] = useState("");
   const [quizDescription, setQuizDescription] = useState("");
+  type QuestionType = "multiple-choice" | "true-false" | "single-select";
+
   const [questions, setQuestions] = useState([
     {
       id: 1,
       question: "",
-      type: "multiple-choice",
+      type: "multiple-choice" as QuestionType,
       options: ["", ""],
       correctAnswer: 0,
       points: 1,
     },
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleQuestionChange = (
     id: number,
@@ -89,7 +95,7 @@ export default function CreateQuiz() {
       {
         id: newId,
         question: "",
-        type: "multiple-choice",
+        type: "multiple-choice" as QuestionType,
         options: ["", ""],
         correctAnswer: 0,
         points: 1,
@@ -105,60 +111,109 @@ export default function CreateQuiz() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    // Validate before submitting
-    if (!quizTitle.trim()) {
-      alert("Please add a quiz title");
-      return;
-    }
-
-    // Check if all questions have content
-    const incompleteQuestions = questions.filter((q) => !q.question.trim());
-    if (incompleteQuestions.length > 0) {
-      alert("Please fill in all question fields");
-      return;
-    }
-
-    // Check if all options have content
-    const incompleteOptions = questions.some((q) =>
-      q.options.some((opt) => !opt.trim())
-    );
-    if (incompleteOptions) {
-      alert("Please fill in all option fields");
-      return;
-    }
-
-    setIsSubmitting(true);
+    setError(null);
 
     try {
-      // This would be an API call in a real application
-      console.log("Submitting quiz:", {
+      // Validate before submitting
+      if (!quizTitle.trim()) {
+        setError("Please add a quiz title");
+        return;
+      }
+
+      // Log the questions for debugging (check console)
+      console.log("Questions to submit:", questions);
+
+      // More detailed validation with specific info about what's missing
+      const emptyQuestions = questions
+        .map((q, i) => (!q.question.trim() ? i + 1 : null))
+        .filter(Boolean);
+
+      if (emptyQuestions.length > 0) {
+        setError(
+          `Please fill question text for question(s) #${emptyQuestions.join(
+            ", "
+          )}`
+        );
+        return;
+      }
+
+      // Check if all options have content - with better error reporting
+      let hasEmptyOptions = false;
+      let firstEmptyOptionInfo = "";
+
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        for (let j = 0; j < q.options.length; j++) {
+          if (q.type !== "true-false" && !q.options[j].trim()) {
+            hasEmptyOptions = true;
+            firstEmptyOptionInfo = `Question #${i + 1}, Option #${j + 1}`;
+            break;
+          }
+        }
+        if (hasEmptyOptions) break;
+      }
+
+      if (hasEmptyOptions) {
+        setError(
+          `Please fill in all option fields (${firstEmptyOptionInfo} is empty)`
+        );
+        return;
+      }
+
+      setIsSubmitting(true);
+
+      // Prepare the quiz data for API with explicit type casting
+      // Inside your handleSubmit function before sending the data
+      const quizData = {
         title: quizTitle,
         description: quizDescription,
-        questions,
-      });
+        questions: questions.map(({ id, ...rest }) => {
+          // Ensure type is one of the required values
+          const questionType = rest.type as
+            | "multiple-choice"
+            | "true-false"
+            | "single-select";
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+          return {
+            question: rest.question.trim(),
+            type: questionType,
+            // Ensure options are strings
+            options: rest.options.map((opt) => String(opt.trim())),
+            correctAnswer: Number(rest.correctAnswer),
+            points: Number(rest.points),
+          };
+        }),
+      };
 
+      console.log(
+        "About to send quiz data:",
+        JSON.stringify(quizData, null, 2)
+      );
+
+      // Send to API
+      const result = await quizApi.createQuiz(quizData);
+      console.log("API response:", result);
+
+      // Show success and redirect
       alert("Quiz created successfully!");
+      router.push("/dashboard/my-quizzes");
+    } catch (err) {
+      console.error("Error creating quiz:", err);
 
-      // Reset form
-      setQuizTitle("");
-      setQuizDescription("");
-      setQuestions([
-        {
-          id: 1,
-          question: "",
-          type: "multiple-choice",
-          options: ["", ""],
-          correctAnswer: 0,
-          points: 1,
-        },
-      ]);
-    } catch (error) {
-      console.error("Error creating quiz:", error);
-      alert("Failed to create quiz. Please try again.");
+      // More detailed error message
+      if (err instanceof Error) {
+        setError(err.message);
+        // Check if it's a validation error from our backend
+        if (err.message.includes("required")) {
+          setError(
+            "Backend validation error: " +
+              err.message +
+              "\nPlease check that all required fields are filled."
+          );
+        }
+      } else {
+        setError("Failed to create quiz. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -169,6 +224,12 @@ export default function CreateQuiz() {
       <h1 className="text-2xl font-bold mb-6 text-midnightblue">
         Create New Quiz
       </h1>
+
+      {error && (
+        <div className="bg-red/10 border border-red text-red px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
 
       <form
         onSubmit={handleSubmit}
@@ -408,7 +469,7 @@ export default function CreateQuiz() {
           <button
             type="button"
             className="bg-grey500 hover:bg-grey500/80 text-midnightblue font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-Blueviolet mr-2 transition duration-150"
-            onClick={() => window.history.back()}
+            onClick={() => router.back()}
           >
             Cancel
           </button>

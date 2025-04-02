@@ -7,20 +7,31 @@ const createQuiz = async (req, res) => {
   try {
     const { title, description, questions } = req.body;
 
+    console.log("Received quiz data:", JSON.stringify(req.body, null, 2));
+
     if (!title || !questions || questions.length === 0) {
       return res.status(400).json({ error: "Missing required fields" });
     }
+
+    // Ensure options are properly formatted for Mongoose
+    const formattedQuestions = questions.map((q) => ({
+      ...q,
+      // Ensure options is an array of strings, not an array of objects
+      options: q.options.map((opt) => String(opt)),
+    }));
 
     // Create new quiz
     const quiz = new Quiz({
       title,
       description,
-      questions,
+      questions: formattedQuestions,
       creator: req.user._id,
     });
 
     // Generate QR code for the quiz
-    const qrCodeData = `${process.env.FRONTEND_URL}/quiz/${quiz.quizId}`;
+    const qrCodeData = `${
+      process.env.FRONTEND_URL || "http://localhost:3000"
+    }/quiz/${quiz.quizId}`;
     const qrCodeImage = await QRCode.toDataURL(qrCodeData);
     quiz.qrCode = qrCodeImage;
 
@@ -28,6 +39,7 @@ const createQuiz = async (req, res) => {
 
     res.status(201).json(quiz);
   } catch (error) {
+    console.error("Error creating quiz:", error);
     res.status(400).json({ error: error.message });
   }
 };

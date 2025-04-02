@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const shortid = require("shortid"); 
 
+// Update the options field in questionSchema
 const questionSchema = new Schema({
   question: {
     type: String,
@@ -13,12 +14,16 @@ const questionSchema = new Schema({
     enum: ["multiple-choice", "true-false", "single-select"],
     default: "multiple-choice",
   },
-  options: [
-    {
-      type: String,
-      required: true,
-    },
-  ],
+  options: {
+    type: [String],  
+    required: true,
+    validate: {
+      validator: function(v) {
+        return Array.isArray(v) && v.length >= 2;
+      },
+      message: 'Questions must have at least 2 options'
+    }
+  },
   correctAnswer: {
     type: Number, 
     required: true,

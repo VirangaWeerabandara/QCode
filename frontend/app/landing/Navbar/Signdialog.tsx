@@ -4,6 +4,7 @@ import { LockClosedIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { API_ROUTES, fetchApi } from "../../../utils/api";
+import { useAuth } from "../../context/AuthContext"; 
 
 interface InputProps {
   value: string;
@@ -13,6 +14,8 @@ interface InputProps {
 interface LoginResponse {
   email: string;
   token: string;
+  _id: string;
+  name: string;
 }
 
 const EmailInput: React.FC<InputProps> = ({ value, onChange }) => (
@@ -69,6 +72,7 @@ const SignDialog: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const router = useRouter();
+  const { login } = useAuth(); // Use the login function from Auth Context
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -81,8 +85,12 @@ const SignDialog: React.FC = () => {
         body: JSON.stringify({ email, password }),
       });
 
-      // Store user data and token
-      localStorage.setItem("user", JSON.stringify(data));
+      // Use Auth Context login instead of directly setting localStorage
+      login(data.token, {
+        email: data.email,
+        id: data._id,
+        name: data.name,
+      });
 
       // Reset form
       setEmail("");
@@ -97,6 +105,7 @@ const SignDialog: React.FC = () => {
         err instanceof Error ? err.message : "Failed to connect to server"
       );
       setIsLoading(false);
+      console.error("Login error:", err);
     }
   };
 
