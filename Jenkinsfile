@@ -12,6 +12,7 @@ pipeline {
         EC2_DNS = credentials('EC2_DNS')
         EC2_INSTANCE_ID = credentials('EC2_INSTANCE_ID')
         BUILD_VERSION = "${env.BUILD_NUMBER}"
+        SKIP_TERRAFORM = "false"
     }
     
     stages {
@@ -57,8 +58,44 @@ pipeline {
                 }
             }
         }
+        
+        stage('Check Infrastructure') {
+            steps {
+                script {
+                    // Use AWS CLI to check if security group rules exist
+                    withCredentials([
+                        string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
+                        string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY')
+                    ]) {
+                        sh '''
+                        SG_ID=$(aws ec2 describe-instances --region ${AWS_REGION} --instance-ids ${EC2_INSTANCE_ID} --query 'Reservations[0].Instances[0].SecurityGroups[0].GroupId' --output text)
+                        
+                        # Check if ports 80, 443, and 3000 are open
+                        HTTP_RULE=$(aws ec2 describe-security-groups --region ${AWS_REGION} --group-ids $SG_ID --query "SecurityGroups[0].IpPermissions[?FromPort==\`80\` && ToPort==\`80\`].IpRanges[?CidrIp==\`0.0.0.0/0\`]" --output text)
+                        HTTPS_RULE=$(aws ec2 describe-security-groups --region ${AWS_REGION} --group-ids $SG_ID --query "SecurityGroups[0].IpPermissions[?FromPort==\`443\` && ToPort==\`443\`].IpRanges[?CidrIp==\`0.0.0.0/0\`]" --output text)
+                        API_RULE=$(aws ec2 describe-security-groups --region ${AWS_REGION} --group-ids $SG_ID --query "SecurityGroups[0].IpPermissions[?FromPort==\`3000\` && ToPort==\`3000\`].IpRanges[?CidrIp==\`0.0.0.0/0\`]" --output text)
+                        
+                        # If all three rules exist, skip terraform
+                        if [ ! -z "$HTTP_RULE" ] && [ ! -z "$HTTPS_RULE" ] && [ ! -z "$API_RULE" ]; then
+                            echo "All required ports are already open. Skipping Terraform."
+                            echo "true" > skip_terraform.txt
+                        else
+                            echo "Some ports need to be opened. Will apply Terraform."
+                            echo "false" > skip_terraform.txt
+                        fi
+                        '''
+                        
+                        // Read the result back
+                        env.SKIP_TERRAFORM = sh(script: 'cat skip_terraform.txt', returnStdout: true).trim()
+                    }
+                }
+            }
+        }
 
         stage('Terraform Init and Apply') {
+            when {
+                expression { return env.SKIP_TERRAFORM != "true" }
+            }
             steps {
                 dir('terraform') {
                     // Create a tfvars file dynamically with sensitive data
