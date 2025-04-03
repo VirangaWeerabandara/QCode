@@ -7,9 +7,14 @@ data "aws_instance" "qcode_instance" {
   instance_id = var.instance_id
 }
 
-# Get the security group ID from the instance
+# Get the security group ID from the instance - fixed approach
+locals {
+  security_group_id = tolist(data.aws_instance.qcode_instance.vpc_security_group_ids)[0]
+}
+
+# Get the security group
 data "aws_security_group" "instance_sg" {
-  id = data.aws_instance.qcode_instance.vpc_security_group_ids[0]
+  id = local.security_group_id
 }
 
 # Create a new security group rule for SSH
