@@ -9,8 +9,11 @@ import {
   ArrowPathIcon,
   EyeIcon,
   ChartBarIcon,
+  ShareIcon,
+  QrCodeIcon,
 } from "@heroicons/react/24/outline";
 import { quizApi, Quiz } from "@/utils/api";
+
 
 export default function MyQuizzes() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
@@ -18,6 +21,9 @@ export default function MyQuizzes() {
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
+  const [copySuccess, setCopySuccess] = useState(false);
 
   useEffect(() => {
     fetchQuizzes();
@@ -76,6 +82,30 @@ export default function MyQuizzes() {
     setSelectedQuiz(null);
   };
 
+  const openShareModal = (quiz: Quiz) => {
+    const baseUrl =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/quiz/`
+        : "https://qcode.altero.dev/quiz/";
+
+    setShareUrl(`${baseUrl}${quiz.quizId}`);
+    setSelectedQuiz(quiz);
+    setIsSharing(true);
+    setCopySuccess(false);
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(shareUrl).then(
+      () => {
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+      },
+      (err) => {
+        console.error("Could not copy text: ", err);
+      }
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -114,7 +144,7 @@ export default function MyQuizzes() {
       {quizzes.length === 0 ? (
         <div className="bg-white rounded-lg shadow-md p-8 text-center border border-grey500/30">
           <p className="text-lightgray mb-4">
-            You haven't created any quizzes yet.
+            You have not created any quizzes yet.
           </p>
           <Link
             href="/dashboard/create-quiz"
@@ -188,18 +218,32 @@ export default function MyQuizzes() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        quiz.isActive
-                          ? "bg-semiblueviolet text-Blueviolet"
-                          : "bg-grey500 text-midnightblue"
+                    <button
+                      onClick={() => toggleQuizStatus(quiz.quizId)}
+                      className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none ${
+                        quiz.isActive ? "bg-Blueviolet" : "bg-grey500"
                       }`}
                     >
+                      <span className="sr-only">Toggle active status</span>
+                      <span
+                        className={`${
+                          quiz.isActive ? "translate-x-6" : "translate-x-1"
+                        } inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
+                      />
+                    </button>
+                    <span className="ml-2 text-xs text-lightgray">
                       {quiz.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end items-center space-x-2">
+                      <button
+                        onClick={() => openShareModal(quiz)}
+                        className="text-midnightblue hover:text-Blueviolet transition duration-150"
+                        title="Share Quiz"
+                      >
+                        <ShareIcon className="h-5 w-5" />
+                      </button>
                       <Link
                         href={`/quiz/${quiz.quizId}`}
                         className="text-midnightblue hover:text-Blueviolet transition duration-150"
@@ -222,15 +266,6 @@ export default function MyQuizzes() {
                       >
                         <PencilIcon className="h-5 w-5" />
                       </Link>
-                      <button
-                        onClick={() => toggleQuizStatus(quiz.quizId)}
-                        className="text-midnightblue hover:text-Blueviolet transition duration-150"
-                        title={
-                          quiz.isActive ? "Deactivate Quiz" : "Activate Quiz"
-                        }
-                      >
-                        <ArrowPathIcon className="h-5 w-5" />
-                      </button>
                       <button
                         onClick={() => confirmDelete(quiz)}
                         className="text-red hover:text-red/70 transition duration-150"
@@ -256,8 +291,8 @@ export default function MyQuizzes() {
                 Delete Quiz
               </h3>
               <p className="text-sm text-lightgray mb-6">
-                Are you sure you want to delete "{selectedQuiz?.title}"? This
-                action cannot be undone.
+                Are you sure you want to delete &quot;{selectedQuiz?.title}
+                &quot;? This action cannot be undone.
               </p>
               <div className="flex justify-center space-x-4">
                 <button
@@ -271,6 +306,63 @@ export default function MyQuizzes() {
                   className="bg-red hover:bg-red/80 text-white font-bold py-2 px-4 rounded transition duration-150"
                 >
                   Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share modal */}
+      {isSharing && (
+        <div className="fixed inset-0 bg-midnightblue bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+          <div className="relative bg-white rounded-lg shadow-xl max-w-md mx-auto p-6">
+            <div className="text-center">
+              <h3 className="text-lg font-medium text-midnightblue mb-4">
+                Share Quiz: {selectedQuiz?.title}
+              </h3>
+
+              <div className="mb-4">
+                <p className="text-sm text-lightgray mb-2">
+                  Quiz ID: {selectedQuiz?.quizId}
+                </p>
+                <div className="flex items-center border rounded-md overflow-hidden">
+                  <input
+                    type="text"
+                    value={shareUrl}
+                    readOnly
+                    className="p-2 flex-1 outline-none text-sm"
+                  />
+                  <button
+                    onClick={copyToClipboard}
+                    className={`px-4 py-2 text-white ${
+                      copySuccess ? "bg-green-500" : "bg-Blueviolet"
+                    }`}
+                  >
+                    {copySuccess ? "Copied!" : "Copy"}
+                  </button>
+                </div>
+              </div>
+
+              {selectedQuiz?.qrCode && (
+                <div className="mt-4 mb-6">
+                  <p className="text-sm text-lightgray mb-2">QR Code</p>
+                  <div className="flex justify-center">
+                    <img
+                      src={selectedQuiz.qrCode}
+                      alt="Quiz QR Code"
+                      className="w-40 h-40"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-center mt-6">
+                <button
+                  onClick={() => setIsSharing(false)}
+                  className="bg-grey500 hover:bg-grey500/80 text-midnightblue font-bold py-2 px-4 rounded transition duration-150"
+                >
+                  Close
                 </button>
               </div>
             </div>

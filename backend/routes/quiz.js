@@ -6,12 +6,16 @@ const {
   updateQuiz,
   deleteQuiz,
   toggleQuizStatus,
+  getPublicQuiz,
 } = require("../controllers/quizController");
 const requireAuth = require("../middleware/requireAuth");
 
 const router = express.Router();
 
-// Require auth for all quiz routes
+// Public route - no auth required
+router.get("/public/:quizId", getPublicQuiz);
+
+// Require auth for all other quiz routes
 router.use(requireAuth);
 
 // Quiz routes
