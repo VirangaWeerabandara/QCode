@@ -98,7 +98,6 @@ pipeline {
             }
             steps {
                 dir('terraform') {
-                    // Create a tfvars file dynamically with sensitive data
                     writeFile file: 'terraform.tfvars', text: """
 instance_id = "${EC2_INSTANCE_ID}"
 """
@@ -111,19 +110,15 @@ instance_id = "${EC2_INSTANCE_ID}"
         stage('Ansible Deploy') {
             steps {
                 dir('ansible') {
-                    // Use the secret file credential
                     withCredentials([file(credentialsId: 'ec2-ssh-key-file', variable: 'SSH_KEY_FILE')]) {
-                        // Make sure the key has proper permissions (required for SSH)
                         sh 'cp $SSH_KEY_FILE ./ec2_key.pem'
                         sh 'chmod 600 ./ec2_key.pem'
                         
-                        // Create inventory file with the local key file
                         writeFile file: 'inventory.ini', text: """
 [qcode]
 ${EC2_IP} ansible_user=ubuntu ansible_ssh_private_key_file=${WORKSPACE}/ansible/ec2_key.pem ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 """
                         
-                        // Run Ansible playbook
                         sh '''
                         ansible-playbook -i inventory.ini playbook.yml \
                         -e "docker_registry=${DOCKER_REGISTRY}" \
@@ -132,7 +127,6 @@ ${EC2_IP} ansible_user=ubuntu ansible_ssh_private_key_file=${WORKSPACE}/ansible/
                         -e "image_tag=${BUILD_VERSION}"
                         '''
                         
-                        // Clean up the key file
                         sh 'rm -f ./ec2_key.pem'
                     }
                 }
