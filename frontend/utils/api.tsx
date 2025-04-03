@@ -1,10 +1,19 @@
-// process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+// const API_BASE_URL =
+//   process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
 const API_BASE_URL = "https://qcode.altero.dev/api";
 
 export const API_ROUTES = {
   LOGIN: `${API_BASE_URL}/user/login`,
   SIGNUP: `${API_BASE_URL}/user/signup`,
-  // Add other API routes as needed
+
+  // Quiz routes
+  CREATE_QUIZ: `${API_BASE_URL}/quiz`,
+  GET_QUIZZES: `${API_BASE_URL}/quiz`,
+  GET_QUIZ: (id: string) => `${API_BASE_URL}/quiz/${id}`,
+  UPDATE_QUIZ: (id: string) => `${API_BASE_URL}/quiz/${id}`,
+  DELETE_QUIZ: (id: string) => `${API_BASE_URL}/quiz/${id}`,
+  TOGGLE_QUIZ_STATUS: (id: string) =>
+    `${API_BASE_URL}/quiz/${id}/toggle-status`,
 };
 
 interface FetchOptions extends RequestInit {
@@ -64,4 +73,78 @@ export const fetchApi = async <T,>(
     console.error("API Error:", error);
     throw error;
   }
+};
+
+// Quiz types
+export interface Question {
+  question: string;
+  type: "multiple-choice" | "true-false" | "single-select";
+  options: string[];
+  correctAnswer: number;
+  points: number;
+}
+
+export interface Quiz {
+  _id: string;
+  quizId: string;
+  title: string;
+  description: string;
+  questions: Question[];
+  creator: string | { _id: string; name: string; email: string };
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  qrCode?: string;
+}
+
+// Quiz API functions
+export const quizApi = {
+  // In the quizApi object
+  createQuiz: async (quizData: {
+    title: string;
+    description: string;
+    questions: Omit<Question, "_id">[];
+  }) => {
+    console.log("Sending quiz data to API:", JSON.stringify(quizData, null, 2));
+    return fetchApi<Quiz>(API_ROUTES.CREATE_QUIZ, {
+      method: "POST",
+      body: JSON.stringify(quizData),
+    });
+  },
+
+  getQuizzes: async () => {
+    return fetchApi<Quiz[]>(API_ROUTES.GET_QUIZZES);
+  },
+
+  getQuiz: async (id: string) => {
+    return fetchApi<Quiz>(API_ROUTES.GET_QUIZ(id));
+  },
+
+  updateQuiz: async (
+    id: string,
+    updates: Partial<{
+      title: string;
+      description: string;
+      questions: Omit<Question, "_id">[];
+      isActive: boolean;
+    }>
+  ) => {
+    return fetchApi<Quiz>(API_ROUTES.UPDATE_QUIZ(id), {
+      method: "PATCH",
+      body: JSON.stringify(updates),
+    });
+  },
+
+  deleteQuiz: async (id: string) => {
+    return fetchApi<{ message: string }>(API_ROUTES.DELETE_QUIZ(id), {
+      method: "DELETE",
+    });
+  },
+
+  toggleQuizStatus: async (id: string) => {
+    return fetchApi<{ message: string; isActive: boolean }>(
+      API_ROUTES.TOGGLE_QUIZ_STATUS(id),
+      { method: "PATCH", body: JSON.stringify({}) }
+    );
+  },
 };
