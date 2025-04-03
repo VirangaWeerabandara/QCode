@@ -8,6 +8,22 @@ const createToken = (_id) => {
   return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
 };
 
+//signup user
+const signupUser = async (req, res) => {
+  const { firstName, lastName, email, password } = req.body;
+
+  try {
+    const user = await User.signup(firstName, lastName, email, password);
+
+    //create token
+    const token = createToken(user._id);
+
+    res.status(201).json({ email, token });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -40,22 +56,6 @@ const logoutUser = (req, res) => {
   });
 
   res.status(200).json({ message: "Logged out successfully" });
-};
-
-//signup user
-const signupUser = async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
-
-  try {
-    const user = await User.signup(firstName, lastName, email, password);
-
-    //create token
-    const token = createToken(user._id);
-
-    res.status(201).json({ email, token });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
 };
 
 module.exports = {
