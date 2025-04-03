@@ -7,7 +7,7 @@ data "aws_instance" "qcode_instance" {
   instance_id = var.instance_id
 }
 
-# Get the security group ID from the instance - fixed approach
+# Get the security group ID from the instance
 locals {
   security_group_id = tolist(data.aws_instance.qcode_instance.vpc_security_group_ids)[0]
 }
@@ -17,15 +17,37 @@ data "aws_security_group" "instance_sg" {
   id = local.security_group_id
 }
 
-# Create a new security group rule for SSH
-resource "aws_security_group_rule" "allow_ssh" {
+# Add HTTP port
+resource "aws_security_group_rule" "allow_http" {
   type              = "ingress"
-  from_port         = 22
-  to_port           = 22
+  from_port         = 80
+  to_port           = 80
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]  # WARNING: This allows SSH access from anywhere - consider restricting
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = data.aws_security_group.instance_sg.id
-  description       = "Allow SSH access"
+  description       = "Allow HTTP traffic"
+}
+
+# Add HTTPS port
+resource "aws_security_group_rule" "allow_https" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = data.aws_security_group.instance_sg.id
+  description       = "Allow HTTPS traffic"
+}
+
+# Add application-specific port for backend API
+resource "aws_security_group_rule" "allow_backend" {
+  type              = "ingress"
+  from_port         = 3000
+  to_port           = 3000
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = data.aws_security_group.instance_sg.id
+  description       = "Allow backend API traffic"
 }
 
 # Output the instance details
