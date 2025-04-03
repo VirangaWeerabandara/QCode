@@ -10,7 +10,8 @@ COPY package.json package-lock.json* ./
 # Install dependencies
 ENV NODE_OPTIONS="--max-old-space-size=512"
 RUN npm ci --no-audit --silent && \
-    npm cache clean --force
+    npm cache clean --force && \
+    npm install --save-dev @types/js-cookie
 
 # Copy application code
 COPY . .
