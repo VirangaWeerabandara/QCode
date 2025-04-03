@@ -86,7 +86,7 @@ describe("User Routes", () => {
       const response = await request(app)
         .post("/api/user/login")
         .send(loginData)
-        .expect(201);
+        .expect(200);
 
       expect(response.body).toHaveProperty("email", userData.email);
       expect(response.body).toHaveProperty("token");
