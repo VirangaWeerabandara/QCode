@@ -43,7 +43,7 @@
         path: /home/ubuntu/
         state: directory
         owner: ubuntu
-        group: ubuntuqcode
+        group: ubuntu
         mode: "0755"
 
     - name: Create docker-compose.yml with cache-busting timestamp
