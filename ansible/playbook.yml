@@ -40,10 +40,10 @@
 
     - name: Create app directory
       file:
-        path: /home/ubuntu/qcode
+        path: /home/ubuntu/
         state: directory
         owner: ubuntu
-        group: ubuntu
+        group: ubuntuqcode
         mode: "0755"
 
     - name: Create docker-compose.yml with cache-busting timestamp

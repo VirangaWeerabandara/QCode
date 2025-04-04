@@ -29,9 +29,7 @@ export default function QuizAttemptPage() {
 
         // Fetch the quiz using the public endpoint
         const response = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api"
-          }/quiz/public/${quizId}`
+          `https://qcode.altero.dev/quiz/public/${quizId}`
         );
 
         if (!response.ok) {

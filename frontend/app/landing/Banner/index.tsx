@@ -31,10 +31,9 @@ const Banner = () => {
               Engage Your Audience with Interactive Real-time Quizzes.
             </h1>
             <h3 className="text-charcoal text-lg font-normal text-center lg:text-start opacity-75 pt-5 lg:pt-0">
-              Perfect for classrooms, meetings, and events. 
-              {/* Create, share, and
+              Perfect for classrooms, meetings, and events. Create, share, and
               analyze responses effortlessly to make learning and discussions
-              more dynamic! */}
+              more dynamic!
             </h3>
 
             {/* Quiz Access Form */}
